@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Livewire\Notifications;
 use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Support\Enums\VerticalAlignment;
 use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Filters\SelectFilter;
@@ -36,7 +40,18 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
         }
 
+        $this->configureFilament();
+    }
+
+    protected function configureFilament(): void
+    {
         FilamentView::registerRenderHook(PanelsRenderHook::HEAD_START, fn () => Blade::render('@vite(\'resources/css/app.css\')'));
+
+        FilamentView::registerRenderHook(PanelsRenderHook::TOPBAR_START, fn () => Blade::render('<div class="flex h-16 px-4 md:px-6 lg:px-8 items-center gap-x-4 max-w-screen-2xl mx-auto w-full 2xl:px-8">'));
+
+        FilamentView::registerRenderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render('</div>'));
+
+        FilamentView::registerRenderHook(PanelsRenderHook::HEAD_START, fn () => Blade::render('<style>.fi-topbar>nav{padding:0!important;}</style>'));
 
         Notifications::verticalAlignment(VerticalAlignment::End);
 
@@ -52,6 +67,25 @@ class AppServiceProvider extends ServiceProvider
                 });
         });
 
+        MarkdownEditor::configureUsing(function (MarkdownEditor $markdownEditor) {
+            $markdownEditor->disableToolbarButtons(['attachFiles', 'codeBlock'])
+                ->enableToolbarButtons(['h2'])
+                ->hintAction(
+                    Action::make('preview')
+                        ->modalHeading(fn (MarkdownEditor $component) => "Preview {$component->getLabel()}")
+                        ->modalSubmitAction(false)
+                        ->modalCancelActionLabel('Close')
+                        ->modalFooterActionsAlignment(Alignment::End)
+                        ->modalWidth(MaxWidth::ExtraLarge)
+                        ->infolist(fn ($state) => [
+                            TextEntry::make('preview')
+                                ->hiddenLabel()
+                                ->state(str($state ?? '')->markdown()->toHtmlString())
+                                ->markdown(),
+                        ]),
+                );
+        });
+
         TextInput::configureUsing(fn (TextInput $input) => $input->maxLength(255));
 
         Select::configureUsing(fn (Select $select) => $select->native(false));
@@ -60,26 +94,25 @@ class AppServiceProvider extends ServiceProvider
 
         TrashedFilter::configureUsing(fn (TrashedFilter $filter) => $filter->native(false));
 
-        \Filament\Actions\ForceDeleteAction::configureUsing(function (\Filament\Actions\ForceDeleteAction $action) {
-            $action->form([
-                TextInput::make('password')
-                    ->password()
-                    ->rule('required')
-                    ->markAsRequired()
-                    ->currentPassword()
-                    ->helperText('Enter your password to confirm.'),
-            ]);
-        });
+        $forceDeletes = [
+            \Filament\Actions\ForceDeleteAction::class,
+            \Filament\Tables\Actions\ForceDeleteAction::class,
+            \Filament\Tables\Actions\ForceDeleteBulkAction::class,
+        ];
 
-        \Filament\Tables\Actions\ForceDeleteAction::configureUsing(function (\Filament\Tables\Actions\ForceDeleteAction $action) {
-            $action->form([
-                TextInput::make('password')
-                    ->password()
-                    ->rule('required')
-                    ->markAsRequired()
-                    ->currentPassword()
-                    ->helperText('Enter your password to confirm.'),
-            ]);
-        });
+        foreach ($forceDeletes as $forceDelete) {
+            $forceDelete::configureUsing(function ($action) {
+                $action->form([
+                    TextInput::make('password')
+                        ->password()
+                        ->rule('required')
+                        ->markAsRequired()
+                        ->currentPassword()
+                        ->helperText('Enter your password to confirm.'),
+                ]);
+            });
+        }
+
+        $this->app->bind(\Filament\Http\Responses\Auth\Contracts\LogoutResponse::class, \App\Http\Responses\LogoutResponse::class);
     }
 }

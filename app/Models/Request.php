@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use App\Enums\RequestClassification;
-use App\Enums\RequestStatus;
+use App\Enums\ActionStatus;
+use App\Enums\RequestClass;
 use App\Models\Concerns\HasManyAttachmentsThroughActions;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,71 +19,67 @@ class Request extends Model
     use HasManyAttachmentsThroughActions, HasUlids, SoftDeletes;
 
     protected $fillable = [
-        'classification',
+        'class',
+        'code',
         'subject',
         'body',
         'priority',
         'difficulty',
         'availability',
-        'office_id',
+        'declination',
+        'organization_id',
         'category_id',
         'subcategory_id',
-        'requestor_id',
+        'user_id',
     ];
 
     protected $casts = [
-        'classification' => RequestClassification::class,
+        'class' => RequestClass::class,
         'availability' => 'datetime',
+        'declination' => 'boolean',
     ];
 
     public static function booted(): void
     {
-        static::deleting(fn (self $request) => $request->purge());
+        static::forceDeleting(fn (self $request) => $request->purge());
 
-        static::saving(function (self $request) {
-            $request->tags()->sync(
-                $request->tags()
-                    ->where(function (Builder $query) use ($request) {
-                        $query->orWhere(fn ($query) => $query->where('taggable_type', Subcategory::class)->where('taggable_id', $request->subcategory_id));
+        static::creating(function (self $request) {
+            $faker = fake();
 
-                        $query->orWhere(fn ($query) => $query->where('taggable_type', Category::class)->where('taggable_id', $request->category_id));
-                    })
-                    ->pluck('tags.id')
-            );
+            do {
+                $codes = collect(range(1, 10))->map(fn () => $faker->bothify('??????####'))->toArray();
+
+                $available = array_diff($codes, self::whereIn('code', $codes)->pluck('code')->toArray());
+            } while (empty($available));
+
+            $request->code = reset($available);
         });
     }
 
     public function assignees(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'assignees')
+        return $this->belongsToMany(User::class, 'assignees', 'request_id', 'assigned_id')
             ->using(Assignee::class)
-            ->withPivot(['response', 'responded_at', 'assigner_id']);
+            ->withTimestamps()
+            ->withPivot(['response', 'responded_at', 'assigned_id', 'assigner_id']);
     }
 
     public function action(): HasOne
     {
         return $this->hasOne(Action::class)
-            ->ofMany(['id' => 'max'], function ($query) {
-                $query->whereIn('status', [
-                    RequestStatus::APPROVED,
-                    RequestStatus::DECLINED,
-                    RequestStatus::PUBLISHED,
-                    RequestStatus::CANCELLED,
-                    RequestStatus::STARTED,
-                    RequestStatus::SUSPENDED,
-                    RequestStatus::RETRACTED,
-                    RequestStatus::COMPLIED,
-                    RequestStatus::COMPLETED,
-                    RequestStatus::RESOLVED,
-                    RequestStatus::VERIFIED,
-                    RequestStatus::DENIED,
-                ]);
-            });
+            ->ofMany(['id' => 'max'], fn ($query) => $query->whereIn('status', ActionStatus::majorActions()));
     }
 
     public function actions(): HasMany
     {
-        return $this->hasMany(Action::class);
+        return $this->hasMany(Action::class)
+            ->latest();
+    }
+
+    public function submitted(): HasOne
+    {
+        return $this->hasOne(Action::class)
+            ->ofMany(['id' => 'max'], fn ($query) => $query->where('status', ActionStatus::SUBMITTED));
     }
 
     public function category(): BelongsTo
@@ -92,7 +87,7 @@ class Request extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function requestor(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
@@ -104,9 +99,9 @@ class Request extends Model
             ->withPivot(['response', 'responded_at']);
     }
 
-    public function office(): BelongsTo
+    public function organization(): BelongsTo
     {
-        return $this->belongsTo(Office::class);
+        return $this->belongsTo(Organization::class);
     }
 
     public function subcategory(): BelongsTo

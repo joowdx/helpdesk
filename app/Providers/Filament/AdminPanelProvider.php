@@ -2,15 +2,19 @@
 
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\Active;
 use App\Http\Middleware\Approve;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\Verify;
+use EightCedars\FilamentInactivityGuard\FilamentInactivityGuardPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -26,6 +30,10 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
+            ->homeUrl('/')
+            ->brandLogo(fn () => view('banner'))
+            ->font('Urbanist')
+            ->colors([...Color::all(), 'gray' => Color::Neutral])
             ->discoverResources(in: app_path('Filament/Panels/Admin/Resources'), for: 'App\\Filament\\Panels\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Panels/Admin/Pages'), for: 'App\\Filament\\Panels\\Admin\\Pages')
             ->discoverWidgets(in: app_path('Filament/Panels/Admin/Widgets'), for: 'App\\Filament\\Panels\\Admin\\Widgets')
@@ -50,7 +58,16 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
                 Verify::class,
                 Approve::class,
+                Active::class,
             ])
-            ->topNavigation();
+            ->plugins([
+                FilamentInactivityGuardPlugin::make()
+                    ->inactiveAfter(180),
+            ])
+            ->globalSearch(false)
+            ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
+            ->databaseTransactions()
+            ->topNavigation()
+            ->spa();
     }
 }

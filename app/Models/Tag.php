@@ -2,21 +2,34 @@
 
 namespace App\Models;
 
+use App\Enums\ActionStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Tag extends Model
 {
-    use HasUlids;
+    use HasFactory, HasUlids, SoftDeletes;
 
     protected $fillable = [
         'name',
-        'taggable_type',
-        'taggable_id',
+        'color',
+        'organization_id',
+        'category_id',
+        'subcategory_id',
     ];
+
+    public static function booted()
+    {
+        static::addGlobalScope('non_trashed_parent', function (Builder $query) {
+            $query->whereHas('organization');
+        });
+    }
 
     public function name(): Attribute
     {
@@ -26,18 +39,26 @@ class Tag extends Model
         );
     }
 
-    public function category(): MorphToMany
+    public function organization(): BelongsTo
     {
-        return $this->morphedByMany(Category::class, 'taggable');
+        return $this->belongsTo(Organization::class);
     }
 
-    public function subcategory(): MorphToMany
+    public function requests(): BelongsToMany
     {
-        return $this->morhpedByMany(Subcategory::class, 'taggable');
+        return $this->belongsToMany(Request::class, 'labels')
+            ->using(Label::class);
     }
 
-    public function taggable(): MorphTo
+    public function open(): BelongsToMany
     {
-        return $this->morphTo();
+        return $this->requests()
+            ->whereDoesntHave('action', fn (Builder $query) => $query->where('status', ActionStatus::CLOSED));
+    }
+
+    public function closed(): BelongsToMany
+    {
+        return $this->requests()
+            ->whereHas('action', fn (Builder $query) => $query->where('status', ActionStatus::CLOSED));
     }
 }

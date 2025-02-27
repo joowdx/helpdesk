@@ -3,10 +3,11 @@
 namespace App\Filament\Panels\Auth\Pages;
 
 use App\Enums\UserRole;
-use App\Models\Office;
+use App\Models\Organization;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Actions\Action;
 use Filament\Events\Auth\Registered;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
@@ -17,14 +18,20 @@ use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
 use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
+use Filament\Notifications\Auth\VerifyEmail;
 use Filament\Notifications\Notification;
 use Filament\Pages\Auth\Register;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 
 class Registration extends Register
 {
-    protected ?string $maxWidth = '2xl';
+    protected ?string $maxWidth = 'xl';
+
+    protected static string $layout = 'filament-panels::components.layout.base';
+
+    protected static string $view = 'filament.panels.auth.pages.register';
 
     public function register(): ?RegistrationResponse
     {
@@ -36,6 +43,7 @@ class Registration extends Register
             return null;
         }
 
+        /** @var Authenticatable|User $user */
         $user = $this->wrapInDatabaseTransaction(function () {
             $this->callHook('beforeValidate');
 
@@ -57,6 +65,12 @@ class Registration extends Register
         });
 
         event(new Registered($user));
+
+        $notification = app(VerifyEmail::class);
+
+        $notification->url = Filament::getVerifyEmailUrl($user);
+
+        $user->notify($notification);
 
         Notification::make()
             ->title('Registration successful')
@@ -84,8 +98,8 @@ class Registration extends Register
                             $this->getNameFormComponent()
                                 ->prefixIcon('heroicon-o-identification'),
                             $this->getNumberFormComponent(),
-                            $this->getOfficeFormComponent(),
                             $this->getDesignationFormComponent(),
+                            $this->getOrganizationFormComponent(),
                         ]),
                     Step::make('Credentials')
                         ->icon('heroicon-o-shield-check')
@@ -118,26 +132,25 @@ class Registration extends Register
             ->directory('avatars');
     }
 
-    protected function getOfficeFormComponent(): Component
-    {
-        $offices = Office::pluck('code', 'id');
-
-        return Select::make('office_id')
-            ->label('Office')
-            ->searchable()
-            ->options($offices)
-            ->disabled($offices->isEmpty())
-            ->placeholder('Select Office')
-            ->prefixIcon('heroicon-o-building-office-2')
-            ->hintIcon('heroicon-o-information-circle')
-            ->hintIconTooltip('Skip this if you can\'t find your office and tell us about it in the message.');
-    }
-
     protected function getDesignationFormComponent(): Component
     {
         return TextInput::make('designation')
             ->label('Designation')
             ->prefixIcon('heroicon-o-tag');
+    }
+
+    protected function getOrganizationFormComponent(): Component
+    {
+        $organization = Organization::pluck('code', 'id');
+
+        return Select::make('organization_id')
+            ->label('Organization')
+            ->searchable()
+            ->options($organization)
+            ->disabled($organization->isEmpty())
+            ->placeholder('Select Organization')
+            ->prefixIcon('heroicon-o-building-office-2')
+            ->hint('Skip this if you can\'t find your organization and tell us about it in the message.');
     }
 
     protected function getNumberFormComponent(): Component
@@ -167,11 +180,14 @@ class Registration extends Register
 
     protected function getRoleFormComponent(): Component
     {
+        $roles = collect(UserRole::cases())
+            ->reject(fn (UserRole $role) => $role === UserRole::ROOT)
+            ->mapWithKeys(fn (UserRole $role) => [$role->value => $role->getLabel()]);
+
         return Select::make('role')
-            ->options(UserRole::class)
-            ->disableOptionWhen(fn (string $value) => $value === UserRole::ADMIN->value)
+            ->options($roles)
             ->default('user')
-            ->helperText('Subject for approval by the administrator.')
+            ->helperText('Subject for approval of the organization.')
             ->required();
     }
 
@@ -182,7 +198,7 @@ class Registration extends Register
             ->rows(6)
             ->rule('required')
             ->markAsRequired()
-            ->helperText('Tell us about the purpose of your registration to help us approve your account.');
+            ->helperText('Tell us about the purpose of your registration to help us approve your account, and in certain cases, we may ask for additional information to verify your identity.');
     }
 
     public function getRegisterFormAction(): Action

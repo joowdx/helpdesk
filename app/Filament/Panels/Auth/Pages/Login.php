@@ -15,15 +15,19 @@ use Illuminate\Validation\ValidationException;
 
 class Login extends LoginPage
 {
+    protected static string $layout = 'filament-panels::components.layout.base';
+
+    protected static string $view = 'filament.panels.auth.pages.login';
+
     public function authenticate(): ?LoginResponse
     {
-        // try {
-        //     $this->rateLimit(5);
-        // } catch (TooManyRequestsException $exception) {
-        //     $this->getRateLimitedNotification($exception)?->send();
+        try {
+            $this->rateLimit(5);
+        } catch (TooManyRequestsException $exception) {
+            $this->getRateLimitedNotification($exception)?->send();
 
-        //     return null;
-        // }
+            return null;
+        }
 
         $data = $this->form->getState();
 

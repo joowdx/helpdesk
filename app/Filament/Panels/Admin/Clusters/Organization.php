@@ -6,5 +6,5 @@ use Filament\Clusters\Cluster;
 
 class Organization extends Cluster
 {
-    protected static ?string $navigationIcon = 'gmdi-layers-o';
+    protected static ?string $navigationIcon = 'gmdi-domain-o';
 }

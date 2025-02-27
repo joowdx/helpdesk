@@ -3,18 +3,18 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Panels\Auth\Pages\Login;
+use App\Filament\Panels\Auth\Pages\Redirect;
 use App\Filament\Panels\Auth\Pages\Registration;
 use App\Http\Middleware\Approve;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\Verify;
-use App\Http\Responses\LoginResponse;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -30,10 +30,15 @@ class AuthPanelProvider extends PanelProvider
             ->default()
             ->id('auth')
             ->path('auth')
+            ->homeUrl('/')
+            ->brandLogo(fn () => view('banner'))
+            ->font('Urbanist')
             ->login(Login::class)
             ->registration(Registration::class)
             ->revealablePasswords(false)
+            ->colors([...Color::all(), 'gray' => Color::Neutral])
             ->discoverPages(in: app_path('Filament/Panels/Auth/Pages'), for: 'App\\Filament\\Panels\\Auth\\Pages')
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->pages([Redirect::class])
             ->middleware([
                 EncryptCookies::class,
@@ -50,19 +55,10 @@ class AuthPanelProvider extends PanelProvider
                 Authenticate::class,
                 Verify::class,
                 Approve::class,
-            ]);
-    }
-}
-
-class Redirect extends Dashboard
-{
-    public function __construct()
-    {
-        $this->mount();
-    }
-
-    public function mount(): void
-    {
-        (new LoginResponse)->toResponse(request());
+            ])
+            ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
+            ->databaseTransactions()
+            ->topNavigation()
+            ->spa();
     }
 }

@@ -37,7 +37,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         'designation',
         'role',
         'purpose',
-        'office_id',
+        'organization_id',
     ];
 
     protected $hidden = [
@@ -96,14 +96,19 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         )->shouldCache();
     }
 
+    public function root(): Attribute
+    {
+        return Attribute::make(fn (): bool => $this->role === UserRole::ROOT);
+    }
+
     public function avatarUrl(): Attribute
     {
         return Attribute::make(fn (): string => $this->avatar ?? (new UiAvatarsProvider)->get($this));
     }
 
-    public function office(): BelongsTo
+    public function organization(): BelongsTo
     {
-        return $this->belongsTo(Office::class);
+        return $this->belongsTo(Organization::class);
     }
 
     public function assignments(): BelongsToMany
@@ -133,6 +138,46 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         return $this->belongsTo(User::class, 'deactivated_by');
     }
 
+    public function scopeUser(Builder $query): Builder
+    {
+        return $query->where('role', UserRole::USER);
+    }
+
+    public function scopeAgent(Builder $query, bool $moderators = false, bool $admin = false): Builder
+    {
+        return $query->where(function ($query) use ($moderators, $admin) {
+            $query->where('role', UserRole::AGENT);
+
+            $query->when($moderators, fn ($query) => $query->orWhere('role', UserRole::MODERATOR));
+
+            $query->when($admin, fn ($query) => $query->orWhere('role', UserRole::ADMIN));
+        });
+    }
+
+    public function scopeModerator(Builder $query): Builder
+    {
+        return $query->where('role', UserRole::MODERATOR);
+    }
+
+    public function scopeAdmin(Builder $query): Builder
+    {
+        return $query->where('role', UserRole::ADMIN);
+    }
+
+    public function scopeRoot(Builder $query): Builder
+    {
+        return $query->where('role', UserRole::ADMIN);
+    }
+
+    public function scopeSortByRole(Builder $query, bool $ascending = true): Builder
+    {
+        $roles = UserRole::cases();
+
+        $placeholders = implode(',', array_fill(0, count($roles), '?'));
+
+        return $query->orderByRaw("FIELD(role, {$placeholders}) ".($ascending ? 'ASC' : 'DESC'), $roles);
+    }
+
     public function scopeForApproval(Builder $query): Builder
     {
         return $query->whereNull('approved_at')->whereNotNull('verified_at');
@@ -150,7 +195,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
 
     public function scopeApprovedAccount(Builder $query): Builder
     {
-        return $query->whereNotNull('approved_at');
+        return $query->verifiedEmail()->whereNotNull('approved_at');
     }
 
     public function reactivate(): void
@@ -181,7 +226,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return in_array($panel->getId(), ['auth', 'user']) ?: $this->role->value === $panel->getId();
+        return in_array($panel->getId(), ['auth', 'user']) ?: $this->role?->value === $panel->getId();
     }
 
     public function getFilamentAvatarUrl(): ?string
