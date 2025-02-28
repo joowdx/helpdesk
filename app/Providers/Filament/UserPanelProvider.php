@@ -61,7 +61,8 @@ class UserPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentInactivityGuardPlugin::make()
-                    ->inactiveAfter(300),
+                    ->inactiveAfter(10800)
+                    ->showNoticeFor(null),
             ])
             ->globalSearch(false)
             ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
