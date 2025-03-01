@@ -49,7 +49,7 @@ class TagResource extends Resource
                     ->unique(ignoreRecord: true, modifyRuleUsing: fn ($get, $rule) => $rule->where('organization_id', $get('organization_id'))),
                 Forms\Components\Select::make('color')
                     ->columnSpanFull()
-                    ->options(array_filter(array_reverse(array_combine(array_keys(Color::all()), array_map('ucfirst', array_keys(Color::all())))), fn ($color) => ! in_array($color, ['Neutral', 'Stone', 'Slate', 'Emerald'])))
+                    ->options(array_reverse(array_combine(array_keys(Color::all()), array_map('ucfirst', array_keys(Color::all())))))
                     ->default('gray')
                     ->live(debounce: 250)
                     ->searchable()
@@ -75,7 +75,6 @@ class TagResource extends Resource
                     ->badge()
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\ColorColumn::make('color'),
                 Tables\Columns\TextColumn::make('organization.code')
                     ->visible($panel === 'root')
                     ->searchable(),

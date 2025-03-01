@@ -4,6 +4,7 @@ namespace App\Filament\Panels\Auth\Pages;
 
 use App\Enums\UserRole;
 use App\Models\Organization;
+use App\Models\User;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Actions\Action;
 use Filament\Events\Auth\Registered;
@@ -85,6 +86,14 @@ class Registration extends Register
 
     public function form(Form $form): Form
     {
+        $next = <<<'JS'
+            $wire.dispatchFormEvent(
+                'wizard::nextStep',
+                'data',
+                getStepIndex(step),
+            )
+        JS;
+
         return $this->makeForm()
             ->schema([
                 Hidden::make('role')
@@ -96,20 +105,32 @@ class Registration extends Register
                             $this->getAvatarFormComponent()
                                 ->hidden(),
                             $this->getNameFormComponent()
-                                ->prefixIcon('heroicon-o-identification'),
-                            $this->getNumberFormComponent(),
-                            $this->getDesignationFormComponent(),
+                                ->prefixIcon('heroicon-o-identification')
+                                ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
+                                ->extraAlpineAttributes(['@keyup.enter' => $next]),
+                            $this->getNumberFormComponent()
+                                ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
+                                ->extraAlpineAttributes(['@keyup.enter' => $next]),
+                            $this->getDesignationFormComponent()
+                                ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
+                                ->extraAlpineAttributes(['@keyup.enter' => $next]),
                             $this->getOrganizationFormComponent(),
                         ]),
                     Step::make('Credentials')
                         ->icon('heroicon-o-shield-check')
                         ->schema([
-                            $this->getEmailFormComponent(),
+                            $this->getEmailFormComponent()
+                                ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
+                                ->extraAlpineAttributes(['@keyup.enter' => $next]),
                             $this->getPasswordFormComponent()
                                 ->label('New Password')
-                                ->prefixIcon('heroicon-o-lock-open'),
+                                ->prefixIcon('heroicon-o-lock-open')
+                                ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
+                                ->extraAlpineAttributes(['@keyup.enter' => $next]),
                             $this->getPasswordConfirmationFormComponent()
-                                ->prefixIcon('heroicon-o-lock-closed'),
+                                ->prefixIcon('heroicon-o-lock-closed')
+                                ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
+                                ->extraAlpineAttributes(['@keyup.enter' => $next]),
                         ]),
                     Step::make('Intent')
                         ->icon('heroicon-o-bolt')
@@ -171,7 +192,6 @@ class Registration extends Register
     protected function getEmailFormComponent(): Component
     {
         return TextInput::make('email')
-            ->label(__('filament-panels::pages/auth/register.form.email.label'))
             ->rules(['email', 'required'])
             ->unique($this->getUserModel())
             ->markAsRequired()

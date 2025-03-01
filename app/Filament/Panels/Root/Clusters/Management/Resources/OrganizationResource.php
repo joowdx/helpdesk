@@ -5,6 +5,7 @@ namespace App\Filament\Panels\Root\Clusters\Management\Resources;
 use App\Filament\Panels\Root\Clusters\Management;
 use App\Filament\Panels\Root\Clusters\Management\Resources\OrganizationResource\Pages;
 use App\Models\Organization;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -40,12 +41,14 @@ class OrganizationResource extends Resource
                     ])
                     ->schema([
                         Forms\Components\TextInput::make('name')
+                            ->autofocus()
                             ->unique(ignoreRecord: true)
                             ->markAsRequired()
                             ->rule('required'),
                         Forms\Components\TextInput::make('code')
-                            ->required()
-                            ->unique(ignoreRecord: true),
+                            ->unique(ignoreRecord: true)
+                            ->markAsRequired()
+                            ->rule('required'),
                     ]),
                 Forms\Components\TextInput::make('address')
                     ->maxLength(255)

@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\ServiceProvider;
 
@@ -39,7 +40,7 @@ class MacroServiceProvider extends ServiceProvider
 
         Blueprint::macro('createCheckName', function (string $expression) {
             /** @var Blueprint $this */
-            return (string) str("{$this->prefix}{$this->table}_{$expression}_check")
+            return (string) str(DB::getTablePrefix()."{$this->table}_{$expression}_check")
                 ->replaceMatches('#[\W_]+#', '_')
                 ->trim('_')
                 ->lower();

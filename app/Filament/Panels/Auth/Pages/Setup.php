@@ -1,0 +1,186 @@
+<?php
+
+namespace App\Filament\Panels\Auth\Pages;
+
+use App\Filament\Panels\Admin\Clusters\Organization\Pages\Settings;
+use App\Filament\Panels\Admin\Clusters\Organization\Resources\UserResource;
+use App\Http\Responses\LoginResponse;
+use App\Models\Organization;
+use App\Models\User;
+use Exception;
+use Filament\Actions\Action;
+use Filament\Facades\Filament;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Pages\Concerns\InteractsWithFormActions;
+use Filament\Pages\SimplePage;
+use Filament\Support\Enums\MaxWidth;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
+
+class Setup extends SimplePage
+{
+    public array $data = [];
+
+    use InteractsWithForms, InteractsWithFormActions;
+
+    protected static string $layout = 'filament-panels::components.layout.base';
+
+    protected static string $view = 'filament.panels.auth.pages.setup';
+
+    public function mount(): void
+    {
+        /** @var User */
+        $user = Filament::auth()->user();
+
+        if ($user->organization?->exists) {
+            (new LoginResponse)->toResponse(request());
+        }
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        if (Auth::user()->admin) {
+            return 'Setup your organization';
+        }
+
+        return 'Organization not yet setup';
+    }
+
+    public function getSubheading(): string|Htmlable|null
+    {
+        if (Auth::user()->admin) {
+            return 'You need to setup your organization first before anyone else can use the system.';
+        }
+
+        return 'You must be invited to an organization before you can use the system.';
+    }
+
+    public function getMaxWidth(): MaxWidth | string | null
+    {
+        return MaxWidth::ExtraLarge;
+    }
+
+    public function form(Form $form): Form
+    {
+        if (! Auth::user()->admin) {
+            return $form;
+        }
+
+        $next = <<<'JS'
+            $wire.dispatchFormEvent(
+                'wizard::nextStep',
+                'data',
+                getStepIndex(step),
+            )
+        JS;
+
+        return $form
+            ->statePath('data')
+            ->schema([
+                Wizard::make()
+                    ->visible()
+                    ->contained(false)
+                    ->submitAction(new HtmlString(Blade::render('<x-filament::button type="submit">Setup</x-filament::button>')))
+                    ->schema([
+                        Wizard\Step::make('Name')
+                            ->schema([
+                                TextInput::make('name')
+                                    ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
+                                    ->extraAlpineAttributes(['@keyup.enter' => $next])
+                                    ->unique(Organization::class, 'name')
+                                    ->markAsRequired()
+                                    ->rule('required'),
+                                TextInput::make('code')
+                                    ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
+                                    ->extraAlpineAttributes(['@keyup.enter' => $next])
+                                    ->unique(Organization::class, 'code')
+                                    ->markAsRequired()
+                                    ->rule('required'),
+                            ]),
+                        Wizard\Step::make('Address')
+                            ->schema([
+                                TextInput::make('address')
+                                    ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
+                                    ->extraAlpineAttributes(['@keyup.enter' => $next]),
+                                TextInput::make('building')
+                                    ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
+                                    ->extraAlpineAttributes(['@keyup.enter' => $next]),
+                                TextInput::make('room')
+                                    ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
+                                    ->extraAlpineAttributes(['@keyup.enter' => $next]),
+                            ]),
+                        Wizard\Step::make('Logo')
+                            ->schema([
+                                FileUpload::make('logo')
+                                    ->hiddenLabel()
+                                    ->avatar()
+                                    ->alignCenter()
+                                    ->directory('logos'),
+                            ]),
+                    ]),
+            ]);
+    }
+
+    public function setup()
+    {
+        if (! Auth::user()->admin) {
+            return;
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $data = $this->form->getState();
+
+            /** @var User $user */
+            $user = Auth::user();
+
+            /** @var Organization $organization */
+            $organization = $user->organization()->create($data);
+
+            $user->organization()->associate($organization)->save();
+
+            Notification::make()
+                ->success()
+                ->title('Success')
+                ->send();
+
+            DB::commit();
+
+            return redirect(UserResource::getUrl(panel: 'admin'));
+        } catch (Exception $ex) {
+            DB::rollBack();
+
+            throw $ex;
+
+            Notification::make()
+                ->danger()
+                ->title('Failed')
+                ->body('Failed to setup your organization')
+                ->send();
+        }
+    }
+
+    public function logoutAction(): Action
+    {
+        return Action::make('Logout')
+            ->link()
+            ->icon('gmdi-logout-o')
+            ->action(function () {
+                Filament::auth()->logout();
+
+                session()->invalidate();
+                session()->regenerateToken();
+
+                return redirect('/');
+            });
+    }
+}

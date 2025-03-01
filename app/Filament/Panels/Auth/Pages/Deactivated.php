@@ -39,6 +39,9 @@ class Deactivated extends SimplePage
             ->action(function () {
                 Filament::auth()->logout();
 
+                session()->invalidate();
+                session()->regenerateToken();
+
                 return redirect('/');
             });
     }

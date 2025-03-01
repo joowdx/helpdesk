@@ -5,6 +5,7 @@ namespace App\Filament\Panels\Auth\Pages;
 use App\Http\Responses\LoginResponse;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Filament\Models\Contracts\FilamentUser;
@@ -56,10 +57,19 @@ class Login extends LoginPage
         ]);
     }
 
+    protected function getRememberFormComponent(): Component
+    {
+        return Checkbox::make('remember')
+            ->label(__('filament-panels::pages/auth/login.form.remember.label'))
+            ->hiddenLabel()
+            ->extraAttributes([
+                'class' => 'hidden',
+            ]);
+    }
+
     protected function getEmailFormComponent(): Component
     {
         return TextInput::make('email')
-            ->label(__('filament-panels::pages/auth/login.form.email.label'))
             ->autocomplete()
             ->autofocus()
             ->extraInputAttributes(['tabindex' => 1])

@@ -101,6 +101,11 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         return Attribute::make(fn (): bool => $this->role === UserRole::ROOT);
     }
 
+    public function admin(): Attribute
+    {
+        return Attribute::make(fn (): bool => $this->role === UserRole::ADMIN);
+    }
+
     public function avatarUrl(): Attribute
     {
         return Attribute::make(fn (): string => $this->avatar ?? (new UiAvatarsProvider)->get($this));

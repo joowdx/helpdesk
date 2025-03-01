@@ -31,6 +31,9 @@ class Verification extends EmailVerificationPrompt
             ->action(function () {
                 Filament::auth()->logout();
 
+                session()->invalidate();
+                session()->regenerateToken();
+
                 return redirect('/');
             });
     }
