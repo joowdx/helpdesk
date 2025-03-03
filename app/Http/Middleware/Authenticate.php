@@ -13,10 +13,6 @@ class Authenticate extends Middleware
      */
     protected function authenticate($request, array $guards): void
     {
-        if ($request->route()->named('filament.auth.auth.logout')) {
-            return;
-        }
-
         $guard = Filament::auth();
 
         if (! $guard->check()) {

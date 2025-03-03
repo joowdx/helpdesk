@@ -68,6 +68,7 @@ class RootPanelProvider extends PanelProvider
             ->globalSearch(false)
             ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
             ->databaseTransactions()
+            ->databaseNotifications()
             ->topNavigation()
             ->spa();
     }

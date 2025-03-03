@@ -1,7 +1,7 @@
 @extends('filament.panels.auth.layout.base')
 
 @section('content')
-<x-filament-panels::form id="form" wire:submit="setup">
+<x-filament-panels::form id="form" wire:submit="initialize">
     {{ $this->form }}
 
     <x-filament-panels::form.actions

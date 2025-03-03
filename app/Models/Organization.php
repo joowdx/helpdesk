@@ -31,7 +31,7 @@ class Organization extends Model
 
     public function logoUrl(): Attribute
     {
-        return Attribute::make(fn () => $this->logo ?? (new UiAvatarsProvider)->get($this));
+        return Attribute::make(fn () => $this->logo ? asset('storage/'.$this->logo) : (new UiAvatarsProvider)->get($this));
     }
 
     public function users(): HasMany

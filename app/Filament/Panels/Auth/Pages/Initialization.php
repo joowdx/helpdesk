@@ -2,38 +2,60 @@
 
 namespace App\Filament\Panels\Auth\Pages;
 
-use App\Filament\Panels\Admin\Clusters\Organization\Pages\Settings;
 use App\Filament\Panels\Admin\Clusters\Organization\Resources\UserResource;
+use App\Filament\Panels\Auth\Concerns\BaseAuthPage;
+use App\Http\Middleware\Active;
+use App\Http\Middleware\Approve;
+use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\Verify;
 use App\Http\Responses\LoginResponse;
 use App\Models\Organization;
 use App\Models\User;
 use Exception;
-use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Wizard;
-use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Pages\Concerns\InteractsWithFormActions;
 use Filament\Pages\SimplePage;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 
-class Setup extends SimplePage
+class Initialization extends SimplePage implements HasMiddleware
 {
-    public array $data = [];
+    use BaseAuthPage;
 
-    use InteractsWithForms, InteractsWithFormActions;
+    public array $data = [];
 
     protected static string $layout = 'filament-panels::components.layout.base';
 
-    protected static string $view = 'filament.panels.auth.pages.setup';
+    protected static string $view = 'filament.panels.auth.pages.initialization';
+
+    public static function getSlug(): string
+    {
+        return 'organization-initialization/prompt';
+    }
+
+    public static function getRelativeRouteName(): string
+    {
+        return 'auth.organization-initialization.prompt';
+    }
+
+    public static function middleware(): array
+    {
+        return [
+            Authenticate::class,
+            Verify::class,
+            Approve::class,
+            Active::class,
+        ];
+    }
 
     public function mount(): void
     {
@@ -63,7 +85,7 @@ class Setup extends SimplePage
         return 'You must be invited to an organization before you can use the system.';
     }
 
-    public function getMaxWidth(): MaxWidth | string | null
+    public function getMaxWidth(): MaxWidth|string|null
     {
         return MaxWidth::ExtraLarge;
     }
@@ -129,7 +151,7 @@ class Setup extends SimplePage
             ]);
     }
 
-    public function setup()
+    public function initialize()
     {
         if (! Auth::user()->admin) {
             return;
@@ -160,27 +182,11 @@ class Setup extends SimplePage
             DB::rollBack();
 
             throw $ex;
-
             Notification::make()
                 ->danger()
                 ->title('Failed')
                 ->body('Failed to setup your organization')
                 ->send();
         }
-    }
-
-    public function logoutAction(): Action
-    {
-        return Action::make('Logout')
-            ->link()
-            ->icon('gmdi-logout-o')
-            ->action(function () {
-                Filament::auth()->logout();
-
-                session()->invalidate();
-                session()->regenerateToken();
-
-                return redirect('/');
-            });
     }
 }

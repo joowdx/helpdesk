@@ -30,8 +30,6 @@ class Registration extends Register
 {
     protected ?string $maxWidth = 'xl';
 
-    protected static string $layout = 'filament-panels::components.layout.base';
-
     protected static string $view = 'filament.panels.auth.pages.register';
 
     public function register(): ?RegistrationResponse

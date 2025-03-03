@@ -18,7 +18,7 @@ class Verify
         /** @var User $user */
         $user = $request->user();
 
-        if (! $request->route()->named('filament.auth.auth.logout') && ! $user?->hasVerifiedEmail()) {
+        if (! $user?->hasVerifiedEmail()) {
             return redirect()->route('filament.auth.auth.email-verification.prompt');
         }
 

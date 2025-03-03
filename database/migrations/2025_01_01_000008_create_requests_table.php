@@ -25,6 +25,7 @@ return new class extends Migration
             $table->foreignUlid('category_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
             $table->foreignUlid('subcategory_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
             $table->foreignUlid('user_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
+            $table->foreignUlid('from_id')->nullable()->constrained('organizations', 'id')->cascadeOnUpdate()->nullOnDelete();
             $table->softDeletes()->index();
             $table->timestamps();
         });

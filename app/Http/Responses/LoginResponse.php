@@ -15,10 +15,6 @@ class LoginResponse implements Responsable
         /** @var User $user */
         $user = $request->user();
 
-        if (! $user?->hasVerifiedEmail()) {
-            return redirect()->route('filament.auth.auth.email-verification.prompt');
-        }
-
         $route = match ($user->role) {
             UserRole::ROOT => 'filament.root.pages.dashboard',
             UserRole::ADMIN => 'filament.admin.pages.dashboard',

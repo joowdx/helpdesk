@@ -18,7 +18,7 @@ class Approve
         /** @var User $user */
         $user = $request->user();
 
-        if (! $request->route()->named('filament.auth.auth.logout') && ! $user?->hasApprovedAccount()) {
+        if (! $user?->hasApprovedAccount()) {
             return redirect()->route('filament.auth.auth.account-approval.prompt');
         }
 

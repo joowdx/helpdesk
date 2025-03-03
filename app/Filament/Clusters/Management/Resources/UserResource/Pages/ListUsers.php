@@ -2,21 +2,29 @@
 
 namespace App\Filament\Clusters\Management\Resources\UserResource\Pages;
 
+use App\Filament\Actions\InviteUserAction;
 use App\Filament\Clusters\Management\Resources\UserResource;
-use App\Models\User;
+use Filament\Facades\Filament;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 class ListUsers extends ListRecords
 {
     protected static string $resource = UserResource::class;
 
+    protected function getHeaderActions(): array
+    {
+        return [
+            InviteUserAction::make(),
+        ];
+    }
+
     public function getTabs(): array
     {
-        $query = fn () => User::query()
-            ->whereNot('id', Auth::id());
+        $panel = Filament::getCurrentPanel()->getId();
+
+        $query = fn () => static::$resource::getEloquentQuery();
 
         return [
             'all' => Tab::make('Active')
@@ -36,11 +44,13 @@ class ListUsers extends ListRecords
                 ->icon('gmdi-gpp-bad-o')
                 ->badgeColor('danger')
                 ->badge(fn () => $query()->onlyDeactivated()->withoutTrashed()->count()),
-            'trashed' => Tab::make('Trashed')
-                ->modifyQueryUsing(fn (Builder $query) => $query->onlyTrashed())
-                ->icon('gmdi-delete-o')
-                ->badgeColor('danger')
-                ->badge(fn () => $query()->onlyTrashed()->count()),
+            ...($panel === 'root' ? [
+                'trashed' => Tab::make('Trashed')
+                    ->modifyQueryUsing(fn (Builder $query) => $query->onlyTrashed())
+                    ->icon('gmdi-delete-o')
+                    ->badgeColor('danger')
+                    ->badge(fn () => $query()->onlyTrashed()->count()),
+            ] : []),
         ];
     }
 }

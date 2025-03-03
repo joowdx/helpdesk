@@ -31,6 +31,7 @@ class Request extends Model
         'category_id',
         'subcategory_id',
         'user_id',
+        'from_id',
     ];
 
     protected $casts = [
@@ -90,6 +91,11 @@ class Request extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function from(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class, 'from_id');
     }
 
     public function assignments(): BelongsToMany

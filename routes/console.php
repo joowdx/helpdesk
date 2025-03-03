@@ -1,10 +1,9 @@
 <?php
 
-use App\Console\Commands\AutoQueueRequestsCommand;
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Console\Commands\AutoQueueRequestsCommand as QueueRequestsCommand;
 use Illuminate\Support\Facades\Schedule;
+use Laravel\Telescope\Console\PruneCommand as TelescopePruneCommand;
 
-Artisan::command('inspire', fn () => $this->comment(Inspiring::quote()))->purpose('Display an inspiring quote');
+Schedule::command(QueueRequestsCommand::class)->withoutOverlapping()->everyFifteenSeconds();
 
-Schedule::command(AutoQueueRequestsCommand::class)->withoutOverlapping()->everyFifteenSeconds();
+Schedule::command(TelescopePruneCommand::class)->everySixHours();

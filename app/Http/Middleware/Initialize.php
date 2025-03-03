@@ -8,7 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class Setup
+class Initialize
 {
     /**
      * Handle an incoming request.
@@ -20,12 +20,8 @@ class Setup
         /** @var User $user */
         $user = $request->user();
 
-        if (
-            ! $request->route()->named('filament.auth.auth.logout') &&
-            in_array($user->role, [UserRole::ADMIN, UserRole::MODERATOR, UserRole::AGENT]) &&
-            is_null($user->organization_id)
-        ) {
-            return redirect()->route('filament.auth.auth.organization-setup.prompt');
+        if (in_array($user->role, [UserRole::ADMIN, UserRole::MODERATOR, UserRole::AGENT, UserRole::USER]) && is_null($user->organization_id)) {
+            return redirect()->route('filament.auth.auth.organization-initialization.prompt');
         }
 
         return $next($request);

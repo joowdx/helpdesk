@@ -14,7 +14,6 @@ class UserResource extends Resource
     {
         return [
             'index' => Pages\ListUsers::route('/'),
-            // 'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 

@@ -5,7 +5,7 @@ namespace App\Providers\Filament;
 use App\Http\Middleware\Active;
 use App\Http\Middleware\Approve;
 use App\Http\Middleware\Authenticate;
-use App\Http\Middleware\Setup;
+use App\Http\Middleware\Initialize;
 use App\Http\Middleware\Verify;
 use EightCedars\FilamentInactivityGuard\FilamentInactivityGuardPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -59,7 +59,7 @@ class UserPanelProvider extends PanelProvider
                 Verify::class,
                 Approve::class,
                 Active::class,
-                Setup::class,
+                Initialize::class,
             ])
             ->plugins([
                 FilamentInactivityGuardPlugin::make()
@@ -69,6 +69,7 @@ class UserPanelProvider extends PanelProvider
             ->globalSearch(false)
             ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
             ->databaseTransactions()
+            ->databaseNotifications()
             ->topNavigation()
             ->spa();
     }

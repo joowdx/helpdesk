@@ -152,8 +152,10 @@ class UserResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     DeactivateAccessAction::make()
                         ->label(fn (User $user) => $user->deactivated_at ? 'Reactivate' : 'Deactivate'),
-                    Tables\Actions\DeleteAction::make(),
-                    Tables\Actions\ForceDeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->visible($panel === 'root'),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->visible($panel === 'root'),
                 ]),
             ])
             ->recordAction(null)
@@ -170,13 +172,13 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()
-            ->whereNot('id', Auth::id())
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
+            ->whereNot('id', Auth::id());
 
         return match (Filament::getCurrentPanel()->getId()) {
-            'root' => $query,
+            'root' => $query
+                ->withoutGlobalScopes([
+                    SoftDeletingScope::class,
+                ]),
             'admin' => $query->whereNot('role', UserRole::ROOT)
                 ->whereNotNull('organization_id')
                 ->where('organization_id', Auth::user()->organization_id),
