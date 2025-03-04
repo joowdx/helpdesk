@@ -81,6 +81,10 @@ class OrganizationResource extends Resource
                 Tables\Columns\TextColumn::make('code')
                     ->searchable(isIndividual: true)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('users_count')
+                    ->label('Users')
+                    ->counts('users')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()

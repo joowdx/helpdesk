@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
-use ValueError;
 
 class Invitation extends SimplePage implements HasMiddleware
 {
@@ -75,57 +74,50 @@ class Invitation extends SimplePage implements HasMiddleware
     public function getSubheading(): string|Htmlable|null
     {
         return match ($this->valid) {
-            true => 'You are invited to join the organization.',
-            default => 'The invitation is invalid or expired.',
+            false => 'The organization invitation request is invalid or expired.',
+            default => null,
         };
     }
 
     #[Computed]
     public function valid(): bool
     {
-        return request()->hasValidSignature() && $this->invitee->id === Auth::user()->id;
+        return request()->hasValidSignature() &&
+            $this->role &&
+            $this->organization &&
+            $this->recipient === Auth::user()->email;
     }
 
     #[Computed]
-    public function role(): ?UserRole
+    public function role(): UserRole
     {
-        if (empty($this->as)) {
-            return null;
-        }
-
-        try {
-            return UserRole::from($this->as);
-        } catch (ValueError) {
-            abort(404);
-        }
+        return UserRole::tryFrom($this->as);
     }
 
     #[Computed]
     public function time(): string
     {
-        return Carbon::parse((int) $this->at)->format('jS \o\f F Y H:i');
+        return Carbon::parse((int) $this->at)
+            ->format('\o\n jS \o\f F Y \a\t H:i');
     }
 
     #[Computed]
-    public function invitee(): ?User
+    public function invitee(): User
     {
-        return User::firstWhere('email', $this->recipient);
+        return User::where('email', $this->recipient)
+            ->firstOrFail();
     }
 
     #[Computed]
     public function inviter(): ?User
     {
-        return User::firstWhere('email', $this->recipient);
+        return User::firstWhere('email', $this->referrer);
     }
 
     #[Computed]
     public function organization(): ?Organization
     {
-        if (empty($this->to)) {
-            return null;
-        }
-
-        return Organization::findOrFail($this->to);
+        return Organization::find($this->to);
     }
 
     public function acceptAction(): Action
@@ -136,7 +128,7 @@ class Invitation extends SimplePage implements HasMiddleware
             ->modalIcon('heroicon-o-check-badge')
             ->modalHeading('Accept Invitation')
             ->modalDescription('You are about to accept the invitation. If you are in under different organization, you will be removed from it.')
-            ->hidden($this->recipient !== Auth::user()->email)
+            // ->hidden($this->recipient !== Auth::user()->email)
             ->action(function () {
                 try {
                     DB::transaction(function () {

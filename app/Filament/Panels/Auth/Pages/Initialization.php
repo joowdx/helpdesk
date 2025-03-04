@@ -69,20 +69,26 @@ class Initialization extends SimplePage implements HasMiddleware
 
     public function getTitle(): string|Htmlable
     {
-        if (Auth::user()->admin) {
-            return 'Setup your organization';
-        }
+        /** @var User */
+        $user = Auth::user();
 
-        return 'Organization not yet setup';
+        return match (true) {
+            isset($user->organization_id) && is_null($user->organization) => 'Organization disabled',
+            $user->admin => 'Setup your organization',
+            default => 'No organization',
+        };
     }
 
     public function getSubheading(): string|Htmlable|null
     {
-        if (Auth::user()->admin) {
-            return 'You need to setup your organization first before anyone else can use the system.';
-        }
+        /** @var User */
+        $user = Auth::user();
 
-        return 'You must be invited to an organization before you can use the system.';
+        return match (true) {
+            isset($user->organization_id) && is_null($user->organization) => 'Your organization has been disabled. If you believe this is a mistake, please contact support.',
+            $user->admin => 'You need to setup your organization first before anyone else can use the system.',
+            default => 'You must be invited to an organization before you can use the system.',
+        };
     }
 
     public function getMaxWidth(): MaxWidth|string|null
@@ -92,7 +98,10 @@ class Initialization extends SimplePage implements HasMiddleware
 
     public function form(Form $form): Form
     {
-        if (! Auth::user()->admin) {
+        /** @var User */
+        $user = Auth::user();
+
+        if (! $user->admin || isset($user->organization_id) && is_null($user->organization)) {
             return $form;
         }
 

@@ -1,4 +1,4 @@
-<div id="auth-content" class="relative flex items-center justify-center min-h-screen">
+<div class="relative flex items-center justify-center min-h-screen">
     <div class="relative z-10 grid w-full max-w-5xl p-10 mx-auto overflow-hidden bg-white dark:bg-gray-900 lg:rounded-2xl max-w-{{ $this->getMaxWidth() ?? 'lg' }}" >
         <section class="grid auto-cols-fr gap-y-6">
             <header class="flex flex-col items-center fi-simple-header">
@@ -30,11 +30,3 @@
     </div>
     <x-filament-actions::modals />
 </div>
-
-@push('styles')
-@stack('styles')
-@endpush
-
-@push('scripts')
-@stack('scripts')
-@endpush

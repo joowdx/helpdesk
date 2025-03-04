@@ -20,7 +20,7 @@ class Initialize
         /** @var User $user */
         $user = $request->user();
 
-        if (in_array($user->role, [UserRole::ADMIN, UserRole::MODERATOR, UserRole::AGENT, UserRole::USER]) && is_null($user->organization_id)) {
+        if (in_array($user->role, [UserRole::ADMIN, UserRole::MODERATOR, UserRole::AGENT, UserRole::USER]) && $user->organization()->doesntExist()) {
             return redirect()->route('filament.auth.auth.organization-initialization.prompt');
         }
 

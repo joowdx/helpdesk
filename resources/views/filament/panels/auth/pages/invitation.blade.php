@@ -11,11 +11,11 @@
                 </div>
 
                 <div class="text-lg font-semibold text-gray-900 dark:text-white">
-                    You have been invited to join
+                    You have been invited to join&hellip;
                 </div>
             </div>
 
-            <div class="flex items-center gap-4 p-6 bg-gray-100 rounded-lg shadow-sm min-w-72 dark:bg-gray-800">
+            <div class="flex items-center gap-4 px-6 py-4 bg-gray-100 rounded-lg shadow-sm min-w-72 dark:bg-gray-800">
                 <img class="rounded-full shadow size-24" src="{{ $this->organization->logo_url }}" alt="Organization Logo">
 
                 <div class="text-left">
@@ -50,7 +50,7 @@
                             </div>
 
                             <div class="text-xs text-gray-700 dark:text-gray-300">
-                                on {{ $this->time }}
+                                {{ $this->time }}
                             </div>
                         </div>
 

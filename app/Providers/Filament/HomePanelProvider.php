@@ -41,7 +41,6 @@ class HomePanelProvider extends PanelProvider
             ])
             ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
             ->databaseTransactions()
-            ->topNavigation()
-            ->spa();
+            ->topNavigation();
     }
 }

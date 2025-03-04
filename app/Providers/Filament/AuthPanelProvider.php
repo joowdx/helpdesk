@@ -11,7 +11,6 @@ use App\Filament\Panels\Auth\Pages\Login;
 use App\Filament\Panels\Auth\Pages\Redirect;
 use App\Filament\Panels\Auth\Pages\Registration;
 use App\Filament\Panels\Auth\Pages\Verification;
-use EightCedars\FilamentInactivityGuard\FilamentInactivityGuardPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -64,11 +63,6 @@ class AuthPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-            ])
-            ->plugins([
-                FilamentInactivityGuardPlugin::make()
-                    ->inactiveAfter(60)
-                    ->showNoticeFor(null),
             ])
             ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
             ->databaseTransactions()
