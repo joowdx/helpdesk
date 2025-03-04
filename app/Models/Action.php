@@ -2,35 +2,40 @@
 
 namespace App\Models;
 
-use App\Enums\RequestStatus;
+use App\Enums\ActionResolution;
+use App\Enums\ActionStatus;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Facades\Blade;
 
 class Action extends Model
 {
-    use HasFactory, HasUlids;
+    use HasUlids;
 
     protected $fillable = [
         'request_id',
         'user_id',
-        'status',
-        'response',
-        'responded_at',
         'remarks',
-        'time',
+        'status',
+        'resolution',
     ];
 
     protected $casts = [
-        'status' => RequestStatus::class,
+        'status' => ActionStatus::class,
+        'resolution' => ActionResolution::class,
     ];
 
-    public function request(): BelongsToMany
+    public function attachment(): MorphOne
     {
-        return $this->belongsToMany(Request::class);
+        return $this->morphOne(Attachment::class, 'attachable');
+    }
+
+    public function request(): BelongsTo
+    {
+        return $this->belongsTo(Request::class);
     }
 
     public function user(): BelongsTo
@@ -38,8 +43,73 @@ class Action extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function attachment(): MorphOne
+    public function remarks(): Attribute
     {
-        return $this->morphOne(Attachment::class, 'attachable');
+        return Attribute::make(
+            set: fn (?string $content): ?string => preg_replace('/[^\S\r\n]+$/m', '', $content ?? ''),
+            get: function (?string $remarks): ?string {
+                if (! in_array($this->status, [ActionStatus::ASSIGNED, ActionStatus::TAGGED])) {
+                    return preg_replace('/(?<!  )$/m', '  ', $remarks ?? '');
+                }
+
+                if ($this->status === ActionStatus::TAGGED) {
+                    preg_match_all('/([+-])(\w{26})/', $remarks, $matches);
+
+                    $existing = Tag::whereIn('id', $matches[2])
+                        ->get(['id', 'name', 'color'])
+                        ->keyBy('id');
+
+                    $tags = collect($matches[2])->map(function ($id, $index) use ($matches, $existing) {
+                        $operation = $matches[1][$index];
+
+                        if ($existing->has($id)) {
+                            $tag = $existing[$id];
+                            $color = $tag->color;
+                            $name = $tag->name;
+                        } else {
+                            $color = 'gray';
+                            $name = '<span class="font-bold font-mono">(non-existent)</span>';
+                        }
+
+                        return [
+                            'operation' => $operation,
+                            'html' => <<<HTML
+                                <x-filament::badge class="w-fit" size="sm" color="{$color}">
+                                    {$name}
+                                </x-filament::badge>
+                            HTML
+                        ];
+                    })->groupBy('operation')->map(function ($tags, $operation) {
+                        $formatted = $tags->pluck('html')->join('');
+
+                        return match ($operation) {
+                            '+' => "<div class='flex gap-1'>Added{$formatted}</div>",
+                            '-' => "<div class='flex gap-1'>Removed{$formatted}</div>",
+                        };
+                    });
+
+                    return Blade::render('<div class="flex flex-col gap-1">'.$tags->join('').'</div>');
+                }
+
+                $pattern = '/\* ([a-z0-9]+)/i';
+
+                preg_match_all($pattern, $remarks, $matches);
+
+                $id = $matches[1] ?? [];
+
+                if (count($id) === 1) {
+                    $user = User::find($id[0]);
+
+                    return preg_replace_callback($pattern, fn () => 'To: '.($user->name ?? '*(<u>anonymous</u>)*'), $remarks);
+                }
+
+                $users = User::whereIn('id', $id)
+                    ->pluck('name', 'id');
+
+                $mapped = preg_replace_callback($pattern, fn ($match) => '* '.($users[$match[1]] ?? '*(<u>anonymous</u>)*'), $remarks);
+
+                return "To:\n{$mapped}";
+            },
+        )->shouldCache();
     }
 }
