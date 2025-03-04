@@ -6,19 +6,24 @@ use App\Enums\UserRole;
 use App\Filament\Actions\Notifications\AcceptInvitationAction;
 use App\Models\Organization;
 use App\Models\User;
+use App\Notifications\InvitationRequest;
+use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
+use DanHarrin\LivewireRateLimiting\WithRateLimiting;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 
 trait InviteUser
 {
+    use WithRateLimiting;
+
     protected function bootInviteUser(): void
     {
         $this->name('invite-user');
@@ -48,11 +53,6 @@ trait InviteUser
                     UserRole::AGENT->value => UserRole::AGENT->getDescription(),
                     UserRole::USER->value => UserRole::USER->getDescription(),
                 ]),
-            // TagsInput::make('email')
-            //     ->placeholder('Email address')
-            //     ->splitKeys(['Tab', ' '])
-            //     ->nestedRecursiveRules(['email'])
-            //     ->required(),
             TextInput::make('email')
                 ->markAsRequired()
                 ->rules(['required', 'email'])
@@ -63,15 +63,15 @@ trait InviteUser
                         ->where('email', $value)
                         ->first();
 
-                    // if (is_null($user)) {
-                    //     $fail('User cannot be found.');
+                    if (is_null($user)) {
+                        $fail('User cannot be found.');
 
-                    //     return;
-                    // }
+                        return;
+                    }
 
-                    // if ($user->organization_id === Auth::user()->organization_id) {
-                    //     $fail('This user is already a member of your organization.');
-                    // }
+                    if ($user->organization_id === Auth::user()->organization_id) {
+                        $fail('This user is already a member of your organization.');
+                    }
                 }),
             Select::make('organization')
                 ->options(Organization::pluck('name', 'id'))
@@ -82,31 +82,57 @@ trait InviteUser
         ]);
 
         $this->action(function (array $data) {
-            $panel = Filament::getCurrentPanel()->getId();
-
             $user = User::firstWhere('email', $data['email']);
+
+            $organization = Organization::find($data['organization'] ?? Auth::user()->organization_id);
+
+            try {
+                if (RateLimiter::tooManyAttempts("invitation-request:{$user->id}:{$organization->id}", 1)) {
+                    throw new TooManyRequestsException(
+                        'invitation-request',
+                        'invite-user',
+                        request()->ip(),
+                        RateLimiter::availableIn("invitation-request:{$user->id}:{$organization->id}")
+                    );
+                }
+            } catch (TooManyRequestsException $exception) {
+                $this->getRateLimitedNotification($exception)?->send();
+
+                return;
+            }
 
             /** @var User $authenticated */
             $authenticated = Auth::user();
 
             $time = now();
 
-            $url = URL::temporarySignedRoute('filament.auth.auth.invitation-request.prompt', $time->clone()->addDay(), [
-                'to' => $panel === 'root' ? $data['organization'] : $authenticated->organization_id,
-                'as' => $data['role'],
-                'at' => $time->timestamp,
-                'referrer' => $authenticated->email,
-                'recipient' => $data['email'],
-            ]);
+            $notification = new InvitationRequest($user, $authenticated, $organization, UserRole::from($data['role']), $time);
 
-            dd($url);
+            $user->notify($notification);
 
             Notification::make()
                 ->title('User invited')
                 ->body('The user has been invited to your organization.')
                 ->success()
-                ->actions([AcceptInvitationAction::make()->url($url)])
-                ->sendToDatabase($user);
+                ->actions([AcceptInvitationAction::make()->url($notification->url)])
+                ->sendToDatabase($user, true);
+
+            Notification::make()
+                ->title('User invited')
+                ->success()
+                ->send();
+
+            RateLimiter::hit("invitation-request:{$user->id}:{$organization->id}", now()->addDay());
         });
+    }
+
+    protected function getRateLimitedNotification(TooManyRequestsException $exception): ?Notification
+    {
+        $next = now()->addSeconds($exception->secondsUntilAvailable)->diffForHumans();
+
+        return Notification::make()
+            ->title('Invitation request limit reached')
+            ->body("A user can only recieve an invitation once a day per organization. Please try again within {$next}.")
+            ->danger();
     }
 }

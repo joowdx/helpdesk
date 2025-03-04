@@ -4,8 +4,6 @@ namespace App\Filament\Panels\Auth\Pages;
 
 use App\Enums\UserRole;
 use App\Filament\Panels\Auth\Concerns\BaseAuthPage;
-use App\Http\Middleware\Active;
-use App\Http\Middleware\Approve;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\Verify;
 use App\Models\Organization;
@@ -66,8 +64,6 @@ class Invitation extends SimplePage implements HasMiddleware
         return [
             Authenticate::class,
             Verify::class,
-            Approve::class,
-            Active::class,
         ];
     }
 
@@ -85,7 +81,8 @@ class Invitation extends SimplePage implements HasMiddleware
         return request()->hasValidSignature() &&
             $this->role &&
             $this->organization &&
-            $this->recipient === Auth::user()->email;
+            $this->recipient === Auth::user()->email &&
+            $this->to !== Auth::user()->organization_id;
     }
 
     #[Computed]
@@ -124,18 +121,18 @@ class Invitation extends SimplePage implements HasMiddleware
     {
         return Action::make('accept')
             ->icon('heroicon-o-check')
-            ->requiresConfirmation()
-            ->modalIcon('heroicon-o-check-badge')
-            ->modalHeading('Accept Invitation')
-            ->modalDescription('You are about to accept the invitation. If you are in under different organization, you will be removed from it.')
-            // ->hidden($this->recipient !== Auth::user()->email)
+            // ->requiresConfirmation()
+            // ->modalIcon('heroicon-o-check-badge')
+            // ->modalHeading('Accept Invitation')
+            // ->modalDescription('You are about to accept the invitation. If you are in under different organization, you will be removed from it.')
+            ->hidden($this->recipient !== Auth::user()->email)
             ->action(function () {
                 try {
                     DB::transaction(function () {
                         /** @var User $user */
                         $user = Auth::user();
 
-                        $user->approved_by = $this->referrer;
+                        $user->approved_by = $this->inviter->id;
                         $user->organization_id = $this->to;
                         $user->approved_at = $this->at;
                         $user->role = $this->as;
@@ -144,12 +141,12 @@ class Invitation extends SimplePage implements HasMiddleware
                     });
 
                     Notification::make()
-                        ->title('Invitation Accepted')
+                        ->title('Invitation accepted')
                         ->success()
                         ->send();
 
                     return redirect()->route("filament.{$this->as}.pages.dashboard");
-                } catch (Exception) {
+                } catch (Exception $ex) {
                     Notification::make()
                         ->title('Something went wrong')
                         ->danger()
