@@ -1,7 +1,19 @@
 @extends('filament.panels.auth.layout.base')
 
 @section('content')
-    @if ($this->valid)
+    @if ($this->unauthorized)
+        <div class="relative flex items-center">
+            <div class="flex-grow border-t border-gray-400"></div>
+            <span class="flex-shrink mx-4 text-gray-400">or</span>
+            <div class="flex-grow border-t border-gray-400"></div>
+        </div>
+
+        <p class="text-sm text-center text-gray-500 dark:text-gray-400">
+            You are not authorized to view this invitation.
+        </p>
+
+        {{ $this->homeAction }}
+    @elseif ($this->valid)
         <div class="flex flex-col items-center text-center">
             <div class="flex flex-col items-center pb-3">
                 <img class="rounded-full size-11" src="{{ $this->invitee->avatar_url }}" alt="User Avatar">

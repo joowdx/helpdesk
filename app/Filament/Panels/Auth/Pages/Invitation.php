@@ -76,6 +76,13 @@ class Invitation extends SimplePage implements HasMiddleware
     }
 
     #[Computed]
+    public function unauthorized()
+    {
+        return request()->hasValidSignature() &&
+            $this->recipient !== Auth::user()->email;
+    }
+
+    #[Computed]
     public function valid(): bool
     {
         return request()->hasValidSignature() &&

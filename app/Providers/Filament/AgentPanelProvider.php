@@ -62,11 +62,6 @@ class AgentPanelProvider extends PanelProvider
                 Active::class,
                 Initialize::class,
             ])
-            ->plugins([
-                FilamentInactivityGuardPlugin::make()
-                    ->inactiveAfter(10800)
-                    ->showNoticeFor(null),
-            ])
             ->globalSearch(false)
             ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
             ->databaseTransactions()

@@ -9,7 +9,6 @@
         "php": "^8.2",
         "codeat3/blade-google-material-design-icons": "^1.20",
         "codeat3/blade-simple-icons": "^6.8",
-        "eightcedars/filament-inactivity-guard": "^0.2.0",
         "filament/filament": "^3.3",
         "laravel/framework": "^12.0",
         "laravel/octane": "^2.8",

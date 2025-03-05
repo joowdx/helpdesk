@@ -60,11 +60,6 @@ class RootPanelProvider extends PanelProvider
                 Approve::class,
                 Active::class,
             ])
-            ->plugins([
-                FilamentInactivityGuardPlugin::make()
-                    ->inactiveAfter(300)
-                    ->showNoticeFor(null),
-            ])
             ->globalSearch(false)
             ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
             ->databaseTransactions()
