@@ -5,6 +5,7 @@ namespace App\Filament\Panels\Agent\Actions\Tables;
 use App\Enums\ActionStatus;
 use App\Enums\UserRole;
 use App\Models\Request;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Actions\Action;
@@ -30,10 +31,12 @@ class RequeueRequestAction extends Action
 
         $this->modalWidth(MaxWidth::ExtraLarge);
 
+        $this->successNotificationTitle('Requeued');
+
         $this->form([
             MarkdownEditor::make('remarks')
                 ->label('Reason')
-                ->required(),
+                ->required(Filament::getCurrentPanel()->getId() === 'agent'),
         ]);
 
         $this->action(function (Request $request, array $data) {
@@ -41,18 +44,22 @@ class RequeueRequestAction extends Action
                 return;
             }
 
-            $request->assignees()->detach(Auth::id());
+            $request->assignees()->detach();
 
             $request->actions()->create([
                 'remarks' => $data['remarks'],
                 'status' => ActionStatus::QUEUED,
                 'user_id' => Auth::id(),
             ]);
+
+            $this->sendSuccessNotification();
         });
 
         $this->closeModalByClickingAway(false);
 
-        $this->visible(fn (Request $request) => Auth::user()->role === UserRole::MODERATOR ?:
+        $this->hidden(fn (Request $request) => $request->action->status->finalized() ?: $request->action->status === ActionStatus::QUEUED);
+
+        $this->visible(fn (Request $request) => in_array(Auth::user()->role, [UserRole::ADMIN, UserRole::MODERATOR]) ?:
             $request->declination === true &&
             $request->assignees()->count() === 1 &&
             $request->action->status === ActionStatus::ASSIGNED,

@@ -23,7 +23,7 @@
                         </h3>
                     </div>
 
-                    <time class="block mb-2 text-sm font-light leading-none text-neutral-500">
+                    <div class="block mb-2 text-sm font-light leading-none text-neutral-500">
                         Please be patient as the assigned
 
                         @switch(true)
@@ -35,7 +35,27 @@
                         @endswitch
 
                         currently working on the request.
-                    </time>
+                    </div>
+                </li>
+            @elseif(!$chat && $progress && in_array($request->action->status, [ActionStatus::SUSPENDED]))
+                <li class="mb-4 ms-6">
+                    <span
+                        class='absolute flex items-center justify-center w-6 h-6 bg-white rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-gray-900'
+                        @style(['color:'.ColorToHex::convert(ActionStatus::ON_HOLD->getColor())])
+                    >
+                        <x-filament::icon class="w-6 h-6" :icon="ActionStatus::ON_HOLD->getIcon()"/>
+                    </span>
+
+                    <div class="flex justify-between">
+                        <h3 class="flex items-center mb-1 text-base italic uppercase">
+                            {{ ActionStatus::ON_HOLD->getLabel() }}
+                        </h3>
+                    </div>
+
+                    <div class="block mb-2 text-sm font-light leading-none text-neutral-500">
+                        The request is currently on hold. The requester is required to comply the agent's
+                        instructions and or requirements before further action can be taken.
+                    </div>
                 </li>
             @endif
 

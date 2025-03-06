@@ -6,7 +6,10 @@ use App\Enums\RequestClass;
 use App\Filament\Actions\Tables\CloseRequestAction;
 use App\Filament\Actions\Tables\RecategorizeRequestAction;
 use App\Filament\Actions\Tables\ReclassifyRequestAction;
+use App\Filament\Actions\Tables\RejectRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
+use App\Filament\Actions\Tables\SuspendRequestAction;
+use App\Filament\Actions\Tables\UnsuspendRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListTickets;
 use App\Filament\Panels\Agent\Actions\Tables\RequeueRequestAction;
@@ -37,28 +40,57 @@ class TicketResource extends RequestResource
     public static function tableActions(): array
     {
         return match (Filament::getCurrentPanel()->getId()) {
-            'agent' => [
-                ShowRequestAction::make(),
-                StartRequestAction::make(),
-                RequeueRequestAction::make(),
-                ViewRequestHistoryAction::make(),
-                ActionGroup::make([
-                    RecategorizeRequestAction::make(),
-                    ReclassifyRequestAction::make(),
-                    CloseRequestAction::make(),
-                ]),
-            ],
-            'moderator' => [
-                ShowRequestAction::make(),
+            'admin' => static::$inbound ? [
                 StartRequestAction::make(),
                 AssignRequestAction::make(),
-                RequeueRequestAction::make(),
                 QueueRequestAction::make(),
+                SuspendRequestAction::make(),
+                UnsuspendRequestAction::make(),
+                ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
+                    RequeueRequestAction::make(),
+                    RejectRequestAction::make(),
                     RecategorizeRequestAction::make(),
                     ReclassifyRequestAction::make(),
-                    CloseRequestAction::make(),
+                    CloseRequestAction::make()
+                        ->requireRemarks(false),
+                ]),
+            ] : [
+                ShowRequestAction::make(),
+                ViewRequestHistoryAction::make(),
+            ],
+            'moderator' => [
+                StartRequestAction::make(),
+                AssignRequestAction::make(),
+                QueueRequestAction::make(),
+                SuspendRequestAction::make(),
+                UnsuspendRequestAction::make(),
+                ShowRequestAction::make(),
+                ViewRequestHistoryAction::make(),
+                ActionGroup::make([
+                    RequeueRequestAction::make(),
+                    RejectRequestAction::make(),
+                    RecategorizeRequestAction::make(),
+                    ReclassifyRequestAction::make(),
+                    CloseRequestAction::make()
+                        ->allowResolved(false)
+                        ->requireRemarks(false),
+                ]),
+            ],
+            'agent' => [
+                StartRequestAction::make(),
+                SuspendRequestAction::make(),
+                UnsuspendRequestAction::make(),
+                ShowRequestAction::make(),
+                ViewRequestHistoryAction::make(),
+                ActionGroup::make([
+                    RequeueRequestAction::make(),
+                    RejectRequestAction::make(),
+                    RecategorizeRequestAction::make(),
+                    ReclassifyRequestAction::make(),
+                    CloseRequestAction::make()
+                        ->allowResolved(false),
                 ]),
             ],
             default => parent::tableActions(),

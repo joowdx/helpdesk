@@ -27,7 +27,7 @@ class StartRequestAction extends Action
         $this->modalDescription('Start this request to begin processing. Once started, the request will be marked as in progress.');
 
         $this->action(function (Request $request) {
-            if ($request->action->status === ActionStatus::STARTED) {
+            if ($request->class !== RequestClass::TICKET || in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::SUSPENDED])) {
                 return;
             }
 
@@ -38,7 +38,7 @@ class StartRequestAction extends Action
         });
 
         $this->visible(function (Request $request) {
-            if ($request->action->status->finalized() || $request->action->status === ActionStatus::STARTED) {
+            if ($request->action->status->finalized() || in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::SUSPENDED])) {
                 return false;
             }
 

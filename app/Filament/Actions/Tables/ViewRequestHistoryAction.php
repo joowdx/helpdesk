@@ -16,11 +16,11 @@ class ViewRequestHistoryAction extends Action
 
         $this->label('History');
 
-        $this->icon('gmdi-route-o');
+        $this->icon('gmdi-history-o');
 
         $this->slideOver();
 
-        $this->modalIcon('gmdi-route-o');
+        $this->modalIcon('gmdi-history-o');
 
         $this->modalWidth(MaxWidth::ExtraLarge);
 

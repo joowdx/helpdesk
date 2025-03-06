@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class CloseRequestAction extends Action
 {
+    protected bool $resolvedEnabled = true;
+
     protected bool $remarksRequired = true;
 
     protected function setUp(): void
@@ -36,7 +38,10 @@ class CloseRequestAction extends Action
         $this->form([
             Radio::make('resolution')
                 ->options(ActionResolution::class)
-                ->disableOptionWhen(fn (string $value) => $value === ActionResolution::NONE->value)
+                ->disableOptionWhen(fn (string $value) =>
+                    $value === ActionResolution::NONE->value ?:
+                    $value === ActionResolution::RESOLVED->value && !$this->resolvedEnabled
+                )
                 ->columns(2)
                 ->required()
                 ->live()
@@ -63,6 +68,13 @@ class CloseRequestAction extends Action
     public function requireRemarks(bool $required = true)
     {
         $this->remarksRequired = $required;
+
+        return $this;
+    }
+
+    public function allowResolved(bool $resolvedEnabled = true)
+    {
+        $this->resolvedEnabled = $resolvedEnabled;
 
         return $this;
     }

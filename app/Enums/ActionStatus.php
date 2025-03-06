@@ -37,8 +37,9 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
     case RESPONDED = 'responded';
     case TAGGED = 'tagged';
 
-    case IN_PROGRESS = 'in_progress'; // Placeholder only
-    case PENDING = 'pending'; // Placeholder only
+    case ON_HOLD = 'on_hold';           // Placeholder only
+    case IN_PROGRESS = 'in_progress';   // Placeholder only
+    case PENDING = 'pending';           // Placeholder only
 
     public static function allowedTransitions(): array
     {
@@ -93,7 +94,6 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::RESOLVED->value,
             self::DENIED->value,
             self::CLOSED->value,
-            self::REJECTED->value,
             self::RESPONDED->value,
             self::STALE->value,
         ], true));
@@ -119,15 +119,16 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::SUBMITTED => 'success',
             self::RETRACTED => 'warning',
             self::ACCEPTED => 'success',
-            self::REJECTED => 'danger',
-            self::ASSIGNED  ,
-            self::ADJUSTED ,
+            self::REJECTED,
+            self::ASSIGNED,
+            self::ADJUSTED,
             self::QUEUED,
             self::RESOLVED,
             self::SCHEDULED => 'info',
             self::COMPLIED => 'warning',
             self::DENIED,
             self::CLOSED => 'danger',
+            self::ON_HOLD => 'warning',
             default => 'gray'
         };
     }
@@ -145,12 +146,15 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::CANCELLED => 'The request has been cancelled and will not be processed further.',
             self::STARTED => 'The request has been taken up and is in progress.',
             self::SUSPENDED => 'The request has been suspended and is awaiting further action.',
-            self::SUBMITTED => 'The request has been published by the user',
+            self::SUBMITTED => 'The request has been published by the user.',
             self::RETRACTED => 'The request has been retracted by the requestor and is waiting to be republished.',
-            self::RESOLVED => 'The request has been completed fully and will no longer receive updates',
-            self::COMPLIED => 'The user submitted the lacking documents',
-            self::DENIED => 'The user has rejected the completion of the request',
-            self::APPROVED => 'The request has been accepted and is being processed',
+            self::RESOLVED => 'The request has been completed fully and will no longer receive updates.',
+            self::COMPLIED => 'The user submitted the lacking documents.',
+            self::DENIED => 'The user has rejected the completion of the request.',
+            self::APPROVED => 'The request has been accepted and is being processed.',
+            self::REJECTED => 'The request assignment has been rejected.',
+            self::ASSIGNED => 'The request has been assigned to a user.',
+            self::QUEUED => 'The request has been queued and is awaiting processing.',
             default => null
         };
     }
@@ -184,15 +188,17 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::TAGGED => 'gmdi-sell-o',
             self::RESPONDED => 'gmdi-chat-o',
             self::IN_PROGRESS => 'gmdi-sync-o',
+            self::ON_HOLD => 'gmdi-pause-o',
             default => 'gmdi-circle-o',
         };
     }
 
     public function getLabel(?string $type = null, ?bool $capitalize = true): ?string
     {
-        if (in_array($this, [self::IN_PROGRESS], true)) {
+        if (in_array($this, [self::IN_PROGRESS, self::ON_HOLD], true)) {
             return match ($this) {
                 self::IN_PROGRESS => 'In Progress',
+                self::ON_HOLD => 'On Hold',
                 default => null,
             };
         }

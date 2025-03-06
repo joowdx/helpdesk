@@ -5,12 +5,16 @@ namespace App\Filament\Clusters\Requests\Resources;
 use App\Enums\RequestClass;
 use App\Enums\UserRole;
 use App\Filament\Actions\Tables\CloseRequestAction;
+use App\Filament\Actions\Tables\RecategorizeRequestAction;
+use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\RespondRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
+use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries;
 use App\Filament\Panels\Moderator\Actions\Tables\AssignRequestAction;
 use App\Filament\Resources\RequestResource;
+use Filament\Facades\Filament;
 use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,40 +37,46 @@ class InquiryResource extends RequestResource
 
     public static function tableActions(): array
     {
-        return match (Auth::user()->role) {
-            UserRole::ADMIN => static::$inbound ? [
+        return match (Filament::getCurrentPanel()->getId()) {
+            'admin' => static::$inbound ? [
                 RespondRequestAction::make(),
                 AssignRequestAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
+                    TagRequestAction::make(),
+                    RecategorizeRequestAction::make(),
+                    ReclassifyRequestAction::make(),
                     CloseRequestAction::make()
                         ->requireRemarks(false),
                 ]),
             ] : [
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
-                ActionGroup::make([
-                    CloseRequestAction::make()
-                        ->requireRemarks(false),
-                ]),
             ],
-            UserRole::MODERATOR => [
+            'moderator' => [
                 RespondRequestAction::make(),
                 AssignRequestAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
+                    TagRequestAction::make(),
+                    RecategorizeRequestAction::make(),
+                    ReclassifyRequestAction::make(),
                     CloseRequestAction::make()
                         ->requireRemarks(false),
                 ]),
             ],
-            UserRole::AGENT => [
+            'agent' => [
                 RespondRequestAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
+                    TagRequestAction::make(),
+                    RecategorizeRequestAction::make(),
+                    ReclassifyRequestAction::make(),
                     CloseRequestAction::make()
+                        ->allowResolved(false)
                         ->requireRemarks(false),
                 ]),
             ],

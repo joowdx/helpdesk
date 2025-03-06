@@ -36,11 +36,11 @@ class AssignRequestAction extends Action
 
         $this->modalDescription('Please select support users to assign this request to.');
 
-        $this->modalContent(fn (Request $request) => $request->organization->users()->agent()->doesntExist() ? str('No support users found')->toHtmlString() : null);
+        $this->modalContent(fn (Request $request) => $request->organization->users()->agent(moderators: true, admin: Auth::user()->role !== UserRole::MODERATOR)->doesntExist() ? str('No support users found')->toHtmlString() : null);
 
         $this->modalWidth(MaxWidth::ExtraLarge);
 
-        $this->modalSubmitAction(fn (Request $request) => $request->organization->users()->agent()->exists() ? null : false);
+        $this->modalSubmitAction(fn (Request $request) => $request->organization->users()->agent(moderators: true, admin: Auth::user()->role !== UserRole::MODERATOR)->exists() ? null : false);
 
         $this->modalSubmitActionLabel('Assign');
 
