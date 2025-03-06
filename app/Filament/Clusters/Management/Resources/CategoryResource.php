@@ -31,14 +31,15 @@ class CategoryResource extends Resource
 
         return $form
             ->schema([
-                Forms\Components\Select::make('organization')
+                Forms\Components\Select::make('organization_id')
                     ->columnSpanFull()
                     ->relationship('organization', 'code')
                     ->searchable()
                     ->preload()
                     ->required()
                     ->default(fn () => $panel !== 'root' ? Auth::user()->organization_id : null)
-                    ->visible(fn (string $operation) => $panel === 'root' && $operation === 'create'),
+                    ->visible(fn (string $operation) => $panel === 'root' && $operation === 'create')
+                    ->dehydratedWhenHidden(),
                 Forms\Components\TextInput::make('name')
                     ->label('Name')
                     ->columnSpanFull()

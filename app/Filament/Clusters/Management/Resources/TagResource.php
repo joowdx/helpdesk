@@ -30,6 +30,8 @@ class TagResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $panel = Filament::getCurrentPanel()->getId();
+
         return $form
             ->schema([
                 Forms\Components\Select::make('organization_id')
@@ -39,7 +41,7 @@ class TagResource extends Resource
                     ->preload()
                     ->required()
                     ->placeholder('Select organization')
-                    ->visible(fn (string $operation) => $operation === 'create'),
+                    ->visible(fn (string $operation) => $panel === 'root' && $operation === 'create'),
                 Forms\Components\TextInput::make('name')
                     ->maxLength(24)
                     ->columnSpanFull()
