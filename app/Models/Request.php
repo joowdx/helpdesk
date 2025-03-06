@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Models\Concerns\HasManyAttachmentsThroughActions;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -55,6 +56,11 @@ class Request extends Model
 
             $request->code = reset($available);
         });
+    }
+
+    public function body(): Attribute
+    {
+        return Attribute::make(fn (string $body) => empty($body) ? null : preg_replace('/(?<!  )$/m', '  ', $body))->shouldCache();
     }
 
     public function assignees(): BelongsToMany

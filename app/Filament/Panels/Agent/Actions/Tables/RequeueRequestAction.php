@@ -3,6 +3,7 @@
 namespace App\Filament\Panels\Agent\Actions\Tables;
 
 use App\Enums\ActionStatus;
+use App\Enums\UserRole;
 use App\Models\Request;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Support\Enums\MaxWidth;
@@ -51,9 +52,9 @@ class RequeueRequestAction extends Action
 
         $this->closeModalByClickingAway(false);
 
-        $this->visible(fn (Request $request) => $request->declination === true &&
+        $this->visible(fn (Request $request) => Auth::user()->role === UserRole::MODERATOR ?:
+            $request->declination === true &&
             $request->assignees()->count() === 1 &&
-            ActionStatus::canTransitionTo($request->action->status, ActionStatus::QUEUED) &&
             $request->action->status === ActionStatus::ASSIGNED,
         );
     }

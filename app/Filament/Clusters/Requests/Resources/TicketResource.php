@@ -4,6 +4,7 @@ namespace App\Filament\Clusters\Requests\Resources;
 
 use App\Enums\RequestClass;
 use App\Filament\Actions\Tables\CloseRequestAction;
+use App\Filament\Actions\Tables\RecategorizeRequestAction;
 use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
@@ -42,6 +43,7 @@ class TicketResource extends RequestResource
                 RequeueRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
+                    RecategorizeRequestAction::make(),
                     ReclassifyRequestAction::make(),
                     CloseRequestAction::make(),
                 ]),
@@ -54,6 +56,7 @@ class TicketResource extends RequestResource
                 QueueRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
+                    RecategorizeRequestAction::make(),
                     ReclassifyRequestAction::make(),
                     CloseRequestAction::make(),
                 ]),

@@ -48,7 +48,7 @@
     @endif
 
     @if ($content ?? $action->remarks)
-        @if ($chat || in_array($action->status, [ActionStatus::TAGGED, ActionStatus::RECATEGORIZED, ActionStatus::RECLASSIFIED]))
+        @if ($chat || in_array($action->status, [ActionStatus::TAGGED, ActionStatus::ASSIGNED, ActionStatus::RECATEGORIZED, ActionStatus::RECLASSIFIED]))
             <div class="prose max-w-none dark:prose-invert [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 prose-sm text-sm leading-6 text-gray-950 dark:text-white">
                 {{ str($content ?? $action->remarks)->when($content ?? $action->status !== ActionStatus::TAGGED, fn ($remarks) => $remarks->markdown())->toHtmlString() }}
             </div>
