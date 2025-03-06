@@ -100,9 +100,6 @@ trait NewRequest
                             ->options($subcategories)
                             ->required()
                             ->placeholder(null)
-                            ->extraAlpineAttributes([
-                                'x-on:change' => 'console.log($event.target.value)',
-                            ])
                             ->helperText(fn () => 'Choose the most relevant category for '.match ($classification) {
                                 RequestClass::INQUIRY => 'your question or request for information.',
                                 RequestClass::SUGGESTION => 'your idea or feedback.',
@@ -111,9 +108,6 @@ trait NewRequest
                         TextInput::make('subject')
                             ->rule('required')
                             ->markAsRequired()
-                            ->extraAttributes([
-                                'x-on:input' => 'event.target.value = event.target.value.charAt(0).toUpperCase() + event.target.value.slice(1)',
-                            ])
                             ->helperText(fn () => 'Be clear and concise about '.match ($classification) {
                                 RequestClass::TICKET => 'the issue you are facing.',
                                 RequestClass::SUGGESTION => 'the idea or suggestion you would like to share.',
@@ -168,6 +162,8 @@ trait NewRequest
         $request->category()->associate($category);
 
         $request->subcategory()->associate($subcategory);
+
+        $request->from()->associate(Auth::user()->organization);
 
         $request->save();
 

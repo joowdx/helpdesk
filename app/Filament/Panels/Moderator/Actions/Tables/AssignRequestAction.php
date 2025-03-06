@@ -4,6 +4,7 @@ namespace App\Filament\Panels\Moderator\Actions\Tables;
 
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
+use App\Enums\UserRole;
 use App\Models\Request;
 use App\Models\User;
 use Exception;
@@ -50,7 +51,7 @@ class AssignRequestAction extends Action
             'assignees' => $request->assignees->pluck('id')->toArray(),
         ]);
 
-        $this->form(fn (Request $request) => $request->organization->users()->agent(moderators: true)->approvedAccount()->exists() ? [
+        $this->form(fn (Request $request) => $request->organization->users()->agent(moderators: true, admin: Auth::user()->role !== UserRole::MODERATOR)->approvedAccount()->exists() ? [
             Toggle::make('declination')
                 ->label('Allow declination')
                 ->helperText('Allow assignees to have the option to decline the assignment')
@@ -62,14 +63,14 @@ class AssignRequestAction extends Action
                 ->exists('users', 'id')
                 ->options(
                     $request->organization->users()
-                        ->agent(moderators: true)
+                        ->agent(moderators: true, admin: Auth::user()->role !== UserRole::MODERATOR)
                         ->approvedAccount()
                         ->sortByRole(false)
                         ->get(['id', 'name', 'role'])
                         ->mapWithKeys(fn ($user) => [$user->id => "{$user->name} ({$user->role->getLabel()}) ".(Auth::id() === $user->id ? '(you)' : '')])
                         ->toArray()
                 )
-                ->descriptions($request->organization->users()->agent(moderators: true)->approvedAccount()->pluck('designation', 'id')->toArray()),
+                ->descriptions($request->organization->users()->agent(moderators: true, admin: Auth::user()->role !== UserRole::MODERATOR)->approvedAccount()->pluck('designation', 'id')->toArray()),
         ] : []);
 
         $this->action(function (Request $request, array $data) {

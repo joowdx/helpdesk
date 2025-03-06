@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Filament\Actions\Tables\RecategorizeRequestAction;
+use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
@@ -29,6 +30,8 @@ class RequestResource extends Resource
     protected static ?string $cluster = Requests::class;
 
     protected static ?RequestClass $class = null;
+
+    protected static bool $inbound  = true;
 
     public static function table(Table $table): Table
     {
@@ -101,7 +104,11 @@ class RequestResource extends Resource
 
         return match ($panel) {
             'root' => $query,
-            'moderator', 'admin' => $query->where('organization_id', Auth::user()->organization_id),
+            'admin' => match(static::$inbound) {
+                false => $query->where('from_id', Auth::user()->organization_id),
+                default => $query->where('organization_id', Auth::user()->organization_id),
+            },
+            'moderator' => $query->where('organization_id', Auth::user()->organization_id),
             'agent' => $query->whereHas('assignees', fn ($query) => $query->where('assigned_id', Auth::id())),
             default => $query->whereRaw('1 = 0'),
         };
@@ -131,8 +138,11 @@ class RequestResource extends Resource
         return [
             ShowRequestAction::make(),
             ViewRequestHistoryAction::make(),
-            TagRequestAction::make(),
-            RecategorizeRequestAction::make(),
+            Tables\Actions\ActionGroup::make([
+                TagRequestAction::make(),
+                RecategorizeRequestAction::make(),
+                ReclassifyRequestAction::make(),
+            ]),
         ];
     }
 

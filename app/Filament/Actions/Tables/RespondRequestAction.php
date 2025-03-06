@@ -97,10 +97,10 @@ class RespondRequestAction extends Action
                 $this->success();
 
                 $this->commitDatabaseTransaction();
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $this->rollBackDatabaseTransaction();
 
-                throw $e;
+                $this->failure();
             }
         });
 
@@ -109,7 +109,7 @@ class RespondRequestAction extends Action
 
             return $valid && match (Filament::getCurrentPanel()->getId()) {
                 'user' => $request->action->status === ActionStatus::RESPONDED,
-                'moderator', 'agent' => in_array($request->action->status, [ActionStatus::RESPONDED, ActionStatus::ASSIGNED]) &&
+                'moderator', 'agent', 'admin' => in_array($request->action->status, [ActionStatus::RESPONDED, ActionStatus::ASSIGNED]) &&
                     $request->assignees->contains(Auth::user()),
                 default => false,
             };

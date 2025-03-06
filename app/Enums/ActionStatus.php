@@ -33,6 +33,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
     case DENIED = 'denied';
     case CLOSED = 'closed';
     case RECLASSIFIED = 'reclassified';
+    case RECATEGORIZED = 'recategorized';
     case RESPONDED = 'responded';
     case TAGGED = 'tagged';
 
@@ -177,6 +178,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::SCHEDULED => 'gmdi-event-o',
             self::COMPLIED => 'gmdi-task-r',
             self::DENIED => 'gmdi-do-not-disturb-on-total-silence',
+            self::RECATEGORIZED => 'gmdi-playlist-add-check-circle-o',
             self::RECLASSIFIED => 'gmdi-swap-horizontal-circle-o',
             self::CLOSED => 'gmdi-cancel-o',
             self::TAGGED => 'gmdi-sell-o',
@@ -217,6 +219,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
                 'ammended' => 'alter',
                 'responded' => 'response',
                 'reclassified' => 'reclassification',
+                'recategorized' => 'recategorization',
                 'tagged' => 'tag',
                 default => $this->value,
             },

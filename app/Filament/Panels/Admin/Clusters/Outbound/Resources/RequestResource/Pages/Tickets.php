@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Panels\Admin\Clusters\Requests\Resources\RequestResource\Pages;
+namespace App\Filament\Panels\Admin\Clusters\Outbound\Resources\RequestResource\Pages;
 
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListTickets;
-use App\Filament\Panels\Admin\Clusters\Requests\Resources\TicketResource;
+use App\Filament\Panels\Admin\Clusters\Outbound\Resources\TicketResource;
 
 class Tickets extends ListTickets
 {

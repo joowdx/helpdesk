@@ -44,8 +44,6 @@ class ReclassifyRequestAction extends Action
                         $fail('The request is already classified as '.$request->class->getLabel().'.');
                     }
                 }),
-            MarkdownEditor::make('remarks')
-                ->label('Remarks'),
         ]);
 
         $this->action(function (Request $request, array $data) {
@@ -63,7 +61,7 @@ class ReclassifyRequestAction extends Action
                 $request->actions()->create([
                     'status' => ActionStatus::RECLASSIFIED,
                     'user_id' => Auth::id(),
-                    'remarks' => $data['remarks']."\n\n\n*Reclassified from ".$old->getLabel().' to '.$new->getLabel().'*',
+                    'remarks' => 'From *'.$old->getLabel().'* to *'.$new->getLabel().'*',
                 ]);
 
                 $this->commitDatabaseTransaction();

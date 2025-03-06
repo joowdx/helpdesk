@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Panels\Admin\Clusters\Requests\Resources\RequestResource\Pages;
+namespace App\Filament\Panels\Admin\Clusters\Inbound\Resources\RequestResource\Pages;
 
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListSuggestions;
-use App\Filament\Panels\Admin\Clusters\Requests\Resources\SuggestionResource;
+use App\Filament\Panels\Admin\Clusters\Inbound\Resources\SuggestionResource;
 
 class Suggestions extends ListSuggestions
 {

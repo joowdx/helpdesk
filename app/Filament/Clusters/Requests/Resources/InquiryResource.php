@@ -34,6 +34,23 @@ class InquiryResource extends RequestResource
     public static function tableActions(): array
     {
         return match (Auth::user()->role) {
+            UserRole::ADMIN => static::$inbound ? [
+                RespondRequestAction::make(),
+                AssignRequestAction::make(),
+                ShowRequestAction::make(),
+                ViewRequestHistoryAction::make(),
+                ActionGroup::make([
+                    CloseRequestAction::make()
+                        ->requireRemarks(false),
+                ]),
+            ] : [
+                ShowRequestAction::make(),
+                ViewRequestHistoryAction::make(),
+                ActionGroup::make([
+                    CloseRequestAction::make()
+                        ->requireRemarks(false),
+                ]),
+            ],
             UserRole::MODERATOR => [
                 RespondRequestAction::make(),
                 AssignRequestAction::make(),
