@@ -3,6 +3,7 @@
 namespace App\Filament\Panels\User\Resources;
 
 use App\Enums\ActionStatus;
+use App\Filament\Actions\Tables\CloseRequestAction;
 use App\Filament\Actions\Tables\ComplyRequestAction;
 use App\Filament\Actions\Tables\DeleteRequestAction;
 use App\Filament\Actions\Tables\ReopenRequestAction;
@@ -79,6 +80,7 @@ class RequestResource extends Resource
                 ComplyRequestAction::make(),
                 ResubmitRequestAction::make()
                     ->label('Resubmit'),
+                CloseRequestAction::make(),
                 ShowRequestAction::make()
                     ->label('Show')
                     ->infolist([

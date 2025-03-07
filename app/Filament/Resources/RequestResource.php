@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Auth;
 
 class RequestResource extends Resource
 {
+    public static bool $inbound = true;
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Request::class;
@@ -30,8 +32,6 @@ class RequestResource extends Resource
     protected static ?string $cluster = Requests::class;
 
     protected static ?RequestClass $class = null;
-
-    protected static bool $inbound = true;
 
     public static function table(Table $table): Table
     {
@@ -43,7 +43,7 @@ class RequestResource extends Resource
                 Tables\Columns\TextColumn::make('action.status')
                     ->label('Status')
                     ->badge()
-                    ->description(fn (Request $request) => "#{$request->code}" . ($request->action->status === ActionStatus::CLOSED ? " ({$request->action->resolution->getLabel()})" : ''))
+                    ->description(fn (Request $request) => "#{$request->code}")
                     ->state(function (Request $request) {
                         return match ($request->action->status) {
                             ActionStatus::RESPONDED,
@@ -108,10 +108,7 @@ class RequestResource extends Resource
 
         return match ($panel) {
             'root' => $query,
-            'admin' => match (static::$inbound) {
-                false => $query->where('from_id', Auth::user()->organization_id),
-                default => $query->where('organization_id', Auth::user()->organization_id),
-            },
+            'admin' => $query->where(static::$inbound ? 'organization_id' : 'from_id', Auth::user()->organization_id),
             'moderator' => $query->where('organization_id', Auth::user()->organization_id),
             'agent' => $query->whereHas('assignees', fn ($query) => $query->where('assigned_id', Auth::id())),
             default => $query->whereRaw('1 = 0'),

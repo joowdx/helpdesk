@@ -5,6 +5,7 @@ namespace App\Filament\Actions\Tables;
 use App\Enums\ActionResolution;
 use App\Enums\ActionStatus;
 use App\Models\Request;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Radio;
 use Filament\Support\Enums\MaxWidth;
@@ -19,11 +20,15 @@ class CloseRequestAction extends Action
 
     protected function setUp(): void
     {
+        $panel = Filament::getCurrentPanel()->getId();
+
         parent::setUp();
 
         $this->name('close-request');
 
         $this->label('Close');
+
+        $this->slideOver();
 
         $this->icon(ActionStatus::CLOSED->getIcon());
 
@@ -31,9 +36,11 @@ class CloseRequestAction extends Action
 
         $this->modalHeading('Close request');
 
-        $this->modalDescription('Closed requests cannot be reopened.');
+        $this->modalDescription(fn (Request $request) => $request->action->status === ActionStatus::COMPLETED ? 'This will mark the request as resolved.' : 'Closed requests cannot be reopened.');
 
         $this->modalWidth(MaxWidth::ExtraLarge);
+
+        $this->closeModalByClickingAway(false);
 
         $this->form([
             Radio::make('resolution')
@@ -70,7 +77,7 @@ class CloseRequestAction extends Action
             ]);
         });
 
-        $this->hidden(fn (Request $request) => $request->action->status->finalized());
+        $this->hidden(fn (Request $request) => $request->action->status->finalized() ?: $panel === 'user' && $request->action->status !== ActionStatus::COMPLETED);
     }
 
     public function requireRemarks(bool $required = true)

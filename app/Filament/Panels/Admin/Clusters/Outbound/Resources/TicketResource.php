@@ -8,9 +8,9 @@ use App\Filament\Panels\Admin\Clusters\Outbound\Resources\RequestResource\Pages\
 
 class TicketResource extends Resource
 {
-    protected static ?string $cluster = Outbound::class;
+    public static bool $inbound = false;
 
-    protected static bool $inbound = false;
+    protected static ?string $cluster = Outbound::class;
 
     public static function getPages(): array
     {

@@ -26,6 +26,8 @@ class TicketResource extends RequestResource
 {
     protected static bool $shouldRegisterNavigation = true;
 
+    protected static ?int $navigationSort = -2;
+
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
 
     protected static ?string $label = 'Tickets';
