@@ -10,7 +10,7 @@ class InquiryResource extends Resource
 {
     protected static ?string $cluster = Outbound::class;
 
-    protected static bool $inbound  = false;
+    protected static bool $inbound = false;
 
     public static function getPages(): array
     {

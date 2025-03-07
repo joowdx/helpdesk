@@ -6,7 +6,6 @@ use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Models\Request;
 use Exception;
-use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Radio;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Actions\Action;
@@ -31,6 +30,8 @@ class ReclassifyRequestAction extends Action
         $this->modalDescription('Reclassify this request to best fit its nature.');
 
         $this->modalWidth(MaxWidth::ExtraLarge);
+
+        $this->successNotificationTitle('Request reclassified');
 
         $this->form(fn (Request $request) => [
             Radio::make('class')
@@ -65,6 +66,8 @@ class ReclassifyRequestAction extends Action
                 ]);
 
                 $this->commitDatabaseTransaction();
+
+                $this->sendSuccessNotification();
             } catch (Exception $e) {
                 $this->rollbackDatabaseTransaction();
 

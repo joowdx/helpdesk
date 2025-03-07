@@ -36,6 +36,8 @@ class SuspendRequestAction extends Action
 
         $this->modalSubmitActionLabel('Confirm');
 
+        $this->successNotificationTitle('Request suspended');
+
         $this->form([
             MarkdownEditor::make('remarks')
                 ->label('Reason')
@@ -53,6 +55,8 @@ class SuspendRequestAction extends Action
                 'user_id' => Auth::id(),
                 'remarks' => $data['remarks'],
             ]);
+
+            $this->sendSuccessNotification();
         });
 
         $this->visible(function (Request $request) {
@@ -60,7 +64,7 @@ class SuspendRequestAction extends Action
                 return false;
             }
 
-            return match ($request->class) {
+            return in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::COMPLIED]) && match ($request->class) {
                 RequestClass::TICKET => $request->assignees->contains(Auth::user()),
                 default => false,
             };

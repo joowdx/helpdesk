@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Facades\Blade;
 
-use function PHPSTORM_META\map;
-
 class Action extends Model
 {
     use HasUlids;
@@ -50,7 +48,7 @@ class Action extends Model
         return Attribute::make(
             set: fn (?string $content): ?string => empty($content) ? null : preg_replace('/[^\S\r\n]+$/m', '', $content ?? ''),
             get: function (?string $remarks): ?string {
-                return match($this->status) {
+                return match ($this->status) {
                     ActionStatus::ASSIGNED => $this->formatAssigned(),
                     ActionStatus::TAGGED => $this->formatTags(),
                     ActionStatus::RECATEGORIZED => $this->formatRecategorized(),

@@ -9,6 +9,7 @@ use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\RejectRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\SuspendRequestAction;
+use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\UnsuspendRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListTickets;
@@ -42,13 +43,14 @@ class TicketResource extends RequestResource
         return match (Filament::getCurrentPanel()->getId()) {
             'admin' => static::$inbound ? [
                 StartRequestAction::make(),
-                AssignRequestAction::make(),
                 QueueRequestAction::make(),
                 SuspendRequestAction::make(),
                 UnsuspendRequestAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
+                    TagRequestAction::make(),
+                    AssignRequestAction::make(),
                     RequeueRequestAction::make(),
                     RejectRequestAction::make(),
                     RecategorizeRequestAction::make(),
@@ -62,13 +64,14 @@ class TicketResource extends RequestResource
             ],
             'moderator' => [
                 StartRequestAction::make(),
-                AssignRequestAction::make(),
                 QueueRequestAction::make(),
                 SuspendRequestAction::make(),
                 UnsuspendRequestAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
+                    TagRequestAction::make(),
+                    AssignRequestAction::make(),
                     RequeueRequestAction::make(),
                     RejectRequestAction::make(),
                     RecategorizeRequestAction::make(),
@@ -85,6 +88,7 @@ class TicketResource extends RequestResource
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
+                    TagRequestAction::make(),
                     RequeueRequestAction::make(),
                     RejectRequestAction::make(),
                     RecategorizeRequestAction::make(),

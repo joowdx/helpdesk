@@ -38,9 +38,8 @@ class CloseRequestAction extends Action
         $this->form([
             Radio::make('resolution')
                 ->options(ActionResolution::class)
-                ->disableOptionWhen(fn (string $value) =>
-                    $value === ActionResolution::NONE->value ?:
-                    $value === ActionResolution::RESOLVED->value && !$this->resolvedEnabled
+                ->disableOptionWhen(fn (string $value) => $value === ActionResolution::NONE->value ?:
+                    $value === ActionResolution::RESOLVED->value && ! $this->resolvedEnabled
                 )
                 ->columns(2)
                 ->required()

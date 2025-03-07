@@ -26,7 +26,7 @@ class UnsuspendRequestAction extends Action
 
         $this->modalDescription('Are you sure you want to undo the suspension?');
 
-        $this->successNotificationTitle('Request unsuspended');
+        $this->successNotificationTitle('Request suspension undone');
 
         $this->action(function (Request $request) {
             if ($request->action->status !== ActionStatus::SUSPENDED) {
@@ -38,6 +38,6 @@ class UnsuspendRequestAction extends Action
             $this->sendSuccessNotification();
         });
 
-        $this->visible(fn (Request $request) => $request->action->status === ActionStatus::SUSPENDED && $request->action->created_at->addMinutes(15)->greaterThan(now()));
+        $this->visible(fn (Request $request) => $request->action->status === ActionStatus::SUSPENDED && $request->action->created_at->addMinutes(5)->greaterThan(now()));
     }
 }

@@ -75,7 +75,7 @@ trait ApproveAccount
 
             default:
                 $this->action(function (User $user, array $data) {
-                    $organization = match(Filament::getCurrentPanel()->getId()) {
+                    $organization = match (Filament::getCurrentPanel()->getId()) {
                         'root' => $data['organization_id'],
                         default => $user->organization_id,
                     };

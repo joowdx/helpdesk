@@ -3,10 +3,8 @@
 namespace App\Filament\Actions\Tables;
 
 use App\Enums\ActionStatus;
-use App\Enums\UserRole;
 use App\Models\Request;
 use App\Models\User;
-use Exception;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Actions\Action;
@@ -23,8 +21,6 @@ class RejectRequestAction extends Action
         $this->label('Reject');
 
         $this->slideOver();
-
-        $this->color(ActionStatus::REJECTED->getColor());
 
         $this->icon(ActionStatus::REJECTED->getIcon());
 
@@ -57,8 +53,7 @@ class RejectRequestAction extends Action
 
         $this->closeModalByClickingAway(false);
 
-        $this->visible(fn (Request $request) =>
-            $request->declination &&
+        $this->visible(fn (Request $request) => $request->declination &&
             $request->assignees->first(fn (User $user) => $user->id === Auth::id()) &&
             $request->assignees->count() > 1 &&
             $request->action->status === ActionStatus::ASSIGNED,

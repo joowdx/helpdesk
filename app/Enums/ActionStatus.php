@@ -96,6 +96,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::CLOSED->value,
             self::RESPONDED->value,
             self::STALE->value,
+            self::COMPLIED->value,
         ], true));
     }
 

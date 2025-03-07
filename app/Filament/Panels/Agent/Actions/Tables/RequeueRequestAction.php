@@ -21,8 +21,6 @@ class RequeueRequestAction extends Action
 
         $this->slideOver();
 
-        $this->color(ActionStatus::QUEUED->getColor());
-
         $this->icon(ActionStatus::QUEUED->getIcon());
 
         $this->modalIcon(ActionStatus::QUEUED->getIcon());
@@ -59,7 +57,8 @@ class RequeueRequestAction extends Action
 
         $this->hidden(fn (Request $request) => $request->action->status->finalized() ?: $request->action->status === ActionStatus::QUEUED);
 
-        $this->visible(fn (Request $request) => in_array(Auth::user()->role, [UserRole::ADMIN, UserRole::MODERATOR]) ?:
+        $this->visible(fn (Request $request) => $request->action->status === ActionStatus::ASSIGNED &&
+            in_array(Auth::user()->role, [UserRole::ADMIN, UserRole::MODERATOR]) ?:
             $request->declination === true &&
             $request->assignees()->count() === 1 &&
             $request->action->status === ActionStatus::ASSIGNED,

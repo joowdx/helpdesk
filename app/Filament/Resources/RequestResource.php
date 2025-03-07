@@ -31,7 +31,7 @@ class RequestResource extends Resource
 
     protected static ?RequestClass $class = null;
 
-    protected static bool $inbound  = true;
+    protected static bool $inbound = true;
 
     public static function table(Table $table): Table
     {
@@ -64,6 +64,8 @@ class RequestResource extends Resource
                     ->extraCellAttributes(['class' => 'font-mono'])
                     ->tooltip(fn (Request $request) => $request->organization->name)
                     ->hidden(! in_array($panel, ['root'])),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->description(fn (Request $request) => $request->subcategory->name),
                 Tables\Columns\TextColumn::make('class')
                     ->badge()
                     ->alignEnd()
@@ -106,7 +108,7 @@ class RequestResource extends Resource
 
         return match ($panel) {
             'root' => $query,
-            'admin' => match(static::$inbound) {
+            'admin' => match (static::$inbound) {
                 false => $query->where('from_id', Auth::user()->organization_id),
                 default => $query->where('organization_id', Auth::user()->organization_id),
             },
