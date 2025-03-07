@@ -11,7 +11,7 @@ use App\Filament\Actions\Tables\RejectRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\SuspendRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
-use App\Filament\Actions\Tables\UnsuspendRequestAction;
+use App\Filament\Actions\Tables\UndoRecentAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListTickets;
 use App\Filament\Panels\Agent\Actions\Tables\RequeueRequestAction;
@@ -48,12 +48,12 @@ class TicketResource extends RequestResource
                 StartRequestAction::make(),
                 CompleteRequestAction::make(),
                 QueueRequestAction::make(),
-                SuspendRequestAction::make(),
-                UnsuspendRequestAction::make(),
+                UndoRecentAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
                     TagRequestAction::make(),
+                    SuspendRequestAction::make(),
                     AssignRequestAction::make(),
                     RequeueRequestAction::make(),
                     RejectRequestAction::make(),
@@ -70,12 +70,12 @@ class TicketResource extends RequestResource
                 StartRequestAction::make(),
                 CompleteRequestAction::make(),
                 QueueRequestAction::make(),
-                SuspendRequestAction::make(),
-                UnsuspendRequestAction::make(),
+                UndoRecentAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
                     TagRequestAction::make(),
+                    SuspendRequestAction::make(),
                     AssignRequestAction::make(),
                     RequeueRequestAction::make(),
                     RejectRequestAction::make(),
@@ -89,12 +89,12 @@ class TicketResource extends RequestResource
             'agent' => [
                 StartRequestAction::make(),
                 CompleteRequestAction::make(),
-                SuspendRequestAction::make(),
-                UnsuspendRequestAction::make(),
+                UndoRecentAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
                     TagRequestAction::make(),
+                    SuspendRequestAction::make(),
                     RequeueRequestAction::make(),
                     RejectRequestAction::make(),
                     RecategorizeRequestAction::make(),

@@ -38,7 +38,7 @@ class StartRequestAction extends Action
         });
 
         $this->visible(function (Request $request) {
-            if ($request->action->status->finalized() || in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::SUSPENDED])) {
+            if ($request->action->status->finalized() || in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::SUSPENDED, ActionStatus::COMPLETED])) {
                 return false;
             }
 

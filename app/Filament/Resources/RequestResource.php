@@ -75,6 +75,7 @@ class RequestResource extends Resource
                     ->badge()
                     ->wrap()
                     ->alignEnd()
+                    ->toggleable()
                     ->color(fn (Request $request, string $state) => $request->tags->first(fn ($tag) => $tag->name === $state)?->color ?? 'gray'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->since()

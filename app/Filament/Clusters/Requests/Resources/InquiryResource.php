@@ -4,6 +4,7 @@ namespace App\Filament\Clusters\Requests\Resources;
 
 use App\Enums\RequestClass;
 use App\Filament\Actions\Tables\CloseRequestAction;
+use App\Filament\Actions\Tables\CompleteRequestAction;
 use App\Filament\Actions\Tables\RecategorizeRequestAction;
 use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\RespondRequestAction;
@@ -37,6 +38,7 @@ class InquiryResource extends RequestResource
     {
         return match (Filament::getCurrentPanel()->getId()) {
             'admin' => static::$inbound ? [
+                CompleteRequestAction::make(),
                 RespondRequestAction::make(),
                 AssignRequestAction::make(),
                 ShowRequestAction::make(),
@@ -53,6 +55,7 @@ class InquiryResource extends RequestResource
                 ViewRequestHistoryAction::make(),
             ],
             'moderator' => [
+                CompleteRequestAction::make(),
                 RespondRequestAction::make(),
                 AssignRequestAction::make(),
                 ShowRequestAction::make(),
@@ -66,6 +69,7 @@ class InquiryResource extends RequestResource
                 ]),
             ],
             'agent' => [
+                CompleteRequestAction::make(),
                 RespondRequestAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),

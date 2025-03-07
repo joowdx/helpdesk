@@ -37,7 +37,8 @@ class CompleteRequestAction extends Action
 
         $this->form([
             MarkdownEditor::make('remarks')
-                ->helperText('Please describe the reason for suspending this request.'),
+                ->helperText('Please describe the reason for suspending this request.')
+                ->required(),
         ]);
 
         $this->action(function (Request $request, array $data) {

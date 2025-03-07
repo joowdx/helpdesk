@@ -46,6 +46,9 @@ trait ShowRequest
                 ->hidden(fn (Request $request) => $request->tags->isEmpty())
                 ->color(fn (string $state) => $request->tags->first(fn ($tag) => $tag->name === $state)?->color ?? 'gray')
                 ->state(fn (Request $request) => $request->tags->pluck('name')->toArray()),
+            TextEntry::make('from.name')
+                ->hiddenLabel()
+                ->helperText(fn (Request $request) => $request->user->name),
             TextEntry::make('subject')
                 ->hiddenLabel()
                 ->weight(FontWeight::Bold)
