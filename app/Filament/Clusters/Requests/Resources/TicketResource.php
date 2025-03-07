@@ -4,6 +4,7 @@ namespace App\Filament\Clusters\Requests\Resources;
 
 use App\Enums\RequestClass;
 use App\Filament\Actions\Tables\CloseRequestAction;
+use App\Filament\Actions\Tables\CompleteRequestAction;
 use App\Filament\Actions\Tables\RecategorizeRequestAction;
 use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\RejectRequestAction;
@@ -43,6 +44,7 @@ class TicketResource extends RequestResource
         return match (Filament::getCurrentPanel()->getId()) {
             'admin' => static::$inbound ? [
                 StartRequestAction::make(),
+                CompleteRequestAction::make(),
                 QueueRequestAction::make(),
                 SuspendRequestAction::make(),
                 UnsuspendRequestAction::make(),
@@ -64,6 +66,7 @@ class TicketResource extends RequestResource
             ],
             'moderator' => [
                 StartRequestAction::make(),
+                CompleteRequestAction::make(),
                 QueueRequestAction::make(),
                 SuspendRequestAction::make(),
                 UnsuspendRequestAction::make(),
@@ -83,6 +86,7 @@ class TicketResource extends RequestResource
             ],
             'agent' => [
                 StartRequestAction::make(),
+                CompleteRequestAction::make(),
                 SuspendRequestAction::make(),
                 UnsuspendRequestAction::make(),
                 ShowRequestAction::make(),

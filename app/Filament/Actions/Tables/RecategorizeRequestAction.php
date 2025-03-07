@@ -88,8 +88,6 @@ class RecategorizeRequestAction extends Action
             }
         });
 
-        $this->hidden(fn (Request $request) => $request->action->status->finalized() || in_array($request->action->status, [
-            ActionStatus::STARTED,
-        ], true));
+        $this->hidden(fn (Request $request) => $request->action->status->finalized());
     }
 }

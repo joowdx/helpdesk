@@ -43,7 +43,7 @@ class RequestResource extends Resource
                 Tables\Columns\TextColumn::make('action.status')
                     ->label('Status')
                     ->badge()
-                    ->description(fn (Request $request) => "#{$request->code}")
+                    ->description(fn (Request $request) => "#{$request->code}" . ($request->action->status === ActionStatus::CLOSED ? " ({$request->action->resolution->getLabel()})" : ''))
                     ->state(function (Request $request) {
                         return match ($request->action->status) {
                             ActionStatus::RESPONDED,

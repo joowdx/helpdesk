@@ -123,4 +123,17 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Requests Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This configuration options determine the default settings for requests.
+    |
+    */
+
+    'requests' => [
+        'auto_resolve' => env('REQUESTS_AUTO_RESOLVE', 168),
+    ],
+
 ];

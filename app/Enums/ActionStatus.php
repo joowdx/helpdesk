@@ -31,6 +31,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
     case COMPLIED = 'complied';
     case VERIFIED = 'verified';
     case DENIED = 'denied';
+    case REOPENED = 'reopened';
     case CLOSED = 'closed';
     case RECLASSIFIED = 'reclassified';
     case RECATEGORIZED = 'recategorized';
@@ -97,6 +98,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::RESPONDED->value,
             self::STALE->value,
             self::COMPLIED->value,
+            self::REOPENED->value,
         ], true));
     }
 
@@ -115,6 +117,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::DECLINED => 'danger',
             self::COMPLETED => 'success',
             self::CANCELLED => 'danger',
+            self::REOPENED => 'info',
             self::STARTED => 'info',
             self::SUSPENDED => 'warning',
             self::SUBMITTED => 'success',
@@ -156,6 +159,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::REJECTED => 'The request assignment has been rejected.',
             self::ASSIGNED => 'The request has been assigned to a user.',
             self::QUEUED => 'The request has been queued and is awaiting processing.',
+            self::REOPENED => 'The request has been reopened for further action.',
             default => null
         };
     }
@@ -186,6 +190,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::RECATEGORIZED => 'gmdi-playlist-add-check-circle-o',
             self::RECLASSIFIED => 'gmdi-swap-horizontal-circle-o',
             self::CLOSED => 'gmdi-cancel-o',
+            self::REOPENED => 'gmdi-replay-o',
             self::TAGGED => 'gmdi-sell-o',
             self::RESPONDED => 'gmdi-chat-o',
             self::IN_PROGRESS => 'gmdi-sync-o',
@@ -257,7 +262,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
     public function finalized()
     {
         return in_array($this, [
-            self::COMPLETED,
+            // self::COMPLETED,
             self::CANCELLED,
             self::CLOSED,
             self::DENIED,

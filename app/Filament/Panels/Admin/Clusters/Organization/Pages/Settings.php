@@ -95,6 +95,12 @@ class Settings extends Page
                                     ->placeholder('Number of minutes')
                                     ->helperText('Number of minutes to auto queue a request')
                                     ->rules(['numeric']),
+                                Forms\Components\TextInput::make('settings.auto_resolve')
+                                    ->label('Request auto resolve')
+                                    ->placeholder('Number of hours')
+                                    ->helperText('Number of hours to auto resolve a completed request')
+                                    ->minValue(48)
+                                    ->rules(['numeric']),
                                 Forms\Components\TextInput::make('settings.auto_assign')
                                     ->label('Request auto assign')
                                     ->placeholder('Number of minutes')

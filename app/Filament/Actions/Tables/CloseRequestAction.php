@@ -46,16 +46,25 @@ class CloseRequestAction extends Action
                 ->live()
                 ->afterStateUpdated(function ($state, $old, $set) {
                     $set('remarks', ActionResolution::from($state)->remarks());
-                }),
+                })
+                ->hidden(fn (Request $request) => $request->action->status === ActionStatus::COMPLETED),
             MarkdownEditor::make('remarks')
                 ->helperText('Please provide a brief reason for closing this request.')
-                ->required(fn () => $this->remarksRequired),
+                ->required(function (Request $request) {
+                    if ($request->action->status === ActionStatus::COMPLETED) {
+                        return false;
+                    }
+
+                    return $this->remarksRequired;
+                }),
         ]);
 
         $this->action(function (Request $request, array $data) {
             $request->actions()->create([
                 'status' => ActionStatus::CLOSED,
-                'resolution' => $data['resolution'],
+                'resolution' => $request->action->status === ActionStatus::COMPLETED
+                    ? ActionResolution::RESOLVED
+                    : $data['resolution'],
                 'remarks' => $data['remarks'],
                 'user_id' => Auth::id(),
             ]);
