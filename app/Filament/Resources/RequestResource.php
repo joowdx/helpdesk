@@ -11,6 +11,7 @@ use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests;
 use App\Filament\Filters\OrganizationFilter;
+use App\Filament\Filters\TagFilter;
 use App\Models\Request;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
@@ -130,7 +131,9 @@ class RequestResource extends Resource
                     ->withUnaffiliated(false),
                 Tables\Filters\TrashedFilter::make(),
             ],
-            default => [],
+            default => [
+                TagFilter::make(),
+            ],
         };
     }
 
