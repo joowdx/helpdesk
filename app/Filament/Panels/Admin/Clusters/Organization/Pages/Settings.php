@@ -106,9 +106,9 @@ class Settings extends Page
                                     ->placeholder('Number of minutes')
                                     ->helperText('Number of minutes to auto assign a request')
                                     ->rules(['numeric']),
-                                Forms\Components\Toggle::make('settings.support_reassignment')
-                                    ->inline(false)
-                                    ->disabled(),
+                                // Forms\Components\Toggle::make('settings.support_reassignment')
+                                //     ->inline(false)
+                                //     ->disabled(),
                             ]),
                     ]),
             ])

@@ -53,9 +53,15 @@ services:
         - '-p${DB_PASSWORD}'
       retries: 3
       timeout: 5s
+  clamav:
+    image: clamav/clamav:latest
+    restart: unless-stopped
+    container_name: helpdesk.antivirus
+    networks:
+      - helpdesk
   mailpit:
     image: 'axllent/mailpit:latest'
-    container_name: helpdesk.mailpit
+    container_name: helpdesk.testmail
     restart: unless-stopped
     ports:
       - '${FORWARD_MAILPIT_PORT:-1025}:1025'

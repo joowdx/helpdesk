@@ -36,38 +36,27 @@ class InquiryResource extends RequestResource
 
     public static function tableActions(): array
     {
+        $moderator = [
+            CompleteRequestAction::make(),
+            RespondRequestAction::make(),
+            AssignRequestAction::make(),
+            ShowRequestAction::make(),
+            ViewRequestHistoryAction::make(),
+            ActionGroup::make([
+                TagRequestAction::make(),
+                RecategorizeRequestAction::make(),
+                ReclassifyRequestAction::make(),
+                CloseRequestAction::make()
+                    ->requireRemarks(false),
+            ]),
+        ];
+
         return match (Filament::getCurrentPanel()->getId()) {
-            'admin' => static::$inbound ? [
-                CompleteRequestAction::make(),
-                RespondRequestAction::make(),
-                AssignRequestAction::make(),
-                ShowRequestAction::make(),
-                ViewRequestHistoryAction::make(),
-                ActionGroup::make([
-                    TagRequestAction::make(),
-                    RecategorizeRequestAction::make(),
-                    ReclassifyRequestAction::make(),
-                    CloseRequestAction::make()
-                        ->requireRemarks(false),
-                ]),
-            ] : [
+            'admin' => static::$inbound ? $moderator : [
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
             ],
-            'moderator' => [
-                CompleteRequestAction::make(),
-                RespondRequestAction::make(),
-                AssignRequestAction::make(),
-                ShowRequestAction::make(),
-                ViewRequestHistoryAction::make(),
-                ActionGroup::make([
-                    TagRequestAction::make(),
-                    RecategorizeRequestAction::make(),
-                    ReclassifyRequestAction::make(),
-                    CloseRequestAction::make()
-                        ->requireRemarks(false),
-                ]),
-            ],
+            'moderator' => $moderator,
             'agent' => [
                 CompleteRequestAction::make(),
                 RespondRequestAction::make(),

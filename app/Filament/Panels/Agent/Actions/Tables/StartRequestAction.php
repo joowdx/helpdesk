@@ -38,11 +38,15 @@ class StartRequestAction extends Action
         });
 
         $this->visible(function (Request $request) {
-            if ($request->action->status->finalized() || in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::SUSPENDED, ActionStatus::COMPLETED])) {
+            if ($request->action->status->finalized() || in_array($request->action->status, [
+                ActionStatus::STARTED,
+                ActionStatus::SUSPENDED,
+                ActionStatus::COMPLETED,
+            ])) {
                 return false;
             }
 
-            return match ($request->class) {
+            return $request->action->status === ActionStatus::ASSIGNED && match ($request->class) {
                 RequestClass::TICKET => $request->assignees->contains(Auth::user()),
                 default => false,
             };

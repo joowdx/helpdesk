@@ -39,25 +39,28 @@ class RequestResource extends Resource
         $panel = Filament::getCurrentPanel()->getId();
 
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->with(['user', 'organization', 'action', 'actions', 'tags']))
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['user', 'organization', 'action', 'actions', 'tags', 'category', 'subcategory']))
             ->columns([
                 Tables\Columns\TextColumn::make('action.status')
                     ->label('Status')
                     ->badge()
                     ->description(fn (Request $request) => "#{$request->code}")
                     ->state(function (Request $request) {
-                        return match ($request->action->status) {
+                        return match ($request->action?->status) {
                             ActionStatus::RESPONDED,
                             ActionStatus::STARTED => ActionStatus::IN_PROGRESS,
                             ActionStatus::SUSPENDED => ActionStatus::ON_HOLD,
-                            default => $request->action->status,
+                            default => $request->action?->status,
                         };
                     }),
                 Tables\Columns\TextColumn::make('subject')
                     ->sortable()
                     ->searchable()
-                    ->limit(36)
+                    ->limit(24)
+                    ->wrap()
                     ->tooltip(fn ($column) => strlen($column->getState()) > $column->getCharacterLimit() ? $column->getState() : null),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->description(fn (Request $request) => $request->from->code),
                 Tables\Columns\TextColumn::make('organization.code')
                     ->sortable()
                     ->searchable()
@@ -128,6 +131,7 @@ class RequestResource extends Resource
 
         return match (Filament::getCurrentPanel()->getId()) {
             'root' => [
+                TagFilter::make(),
                 OrganizationFilter::make()
                     ->withUnaffiliated(false),
                 Tables\Filters\TrashedFilter::make(),

@@ -3,6 +3,7 @@
 namespace App\Filament\Actions\Tables;
 
 use App\Enums\ActionStatus;
+use App\Filament\Forms\FileAttachment;
 use App\Models\Request;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Support\Enums\MaxWidth;
@@ -39,14 +40,22 @@ class CompleteRequestAction extends Action
             MarkdownEditor::make('remarks')
                 ->helperText('Please describe the reason for suspending this request.')
                 ->required(),
+            FileAttachment::make(),
         ]);
 
         $this->action(function (Request $request, array $data) {
-            $request->actions()->create([
+            $action = $request->actions()->create([
                 'status' => ActionStatus::COMPLETED,
                 'user_id' => Auth::id(),
                 'remarks' => $data['remarks'],
             ]);
+
+            if (count($data['files']) > 0) {
+                $action->attachment()->create([
+                    'files' => $data['files'],
+                    'paths' => $data['paths'],
+                ]);
+            }
 
             $this->sendSuccessNotification();
         });

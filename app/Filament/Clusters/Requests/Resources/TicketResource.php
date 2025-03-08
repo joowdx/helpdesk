@@ -43,49 +43,32 @@ class TicketResource extends RequestResource
 
     public static function tableActions(): array
     {
+        $moderator = [
+            StartRequestAction::make(),
+            CompleteRequestAction::make(),
+            QueueRequestAction::make(),
+            UndoRecentAction::make(),
+            ShowRequestAction::make(),
+            ViewRequestHistoryAction::make(),
+            ActionGroup::make([
+                TagRequestAction::make(),
+                SuspendRequestAction::make(),
+                AssignRequestAction::make(),
+                RequeueRequestAction::make(),
+                RejectRequestAction::make(),
+                RecategorizeRequestAction::make(),
+                ReclassifyRequestAction::make(),
+                CloseRequestAction::make()
+                    ->requireRemarks(false),
+            ]),
+        ];
+
         return match (Filament::getCurrentPanel()->getId()) {
-            'admin' => static::$inbound ? [
-                StartRequestAction::make(),
-                CompleteRequestAction::make(),
-                QueueRequestAction::make(),
-                UndoRecentAction::make(),
-                ShowRequestAction::make(),
-                ViewRequestHistoryAction::make(),
-                ActionGroup::make([
-                    TagRequestAction::make(),
-                    SuspendRequestAction::make(),
-                    AssignRequestAction::make(),
-                    RequeueRequestAction::make(),
-                    RejectRequestAction::make(),
-                    RecategorizeRequestAction::make(),
-                    ReclassifyRequestAction::make(),
-                    CloseRequestAction::make()
-                        ->requireRemarks(false),
-                ]),
-            ] : [
+            'admin' => static::$inbound ? $moderator : [
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
             ],
-            'moderator' => [
-                StartRequestAction::make(),
-                CompleteRequestAction::make(),
-                QueueRequestAction::make(),
-                UndoRecentAction::make(),
-                ShowRequestAction::make(),
-                ViewRequestHistoryAction::make(),
-                ActionGroup::make([
-                    TagRequestAction::make(),
-                    SuspendRequestAction::make(),
-                    AssignRequestAction::make(),
-                    RequeueRequestAction::make(),
-                    RejectRequestAction::make(),
-                    RecategorizeRequestAction::make(),
-                    ReclassifyRequestAction::make(),
-                    CloseRequestAction::make()
-                        ->allowResolved(false)
-                        ->requireRemarks(false),
-                ]),
-            ],
+            'moderator' => $moderator,
             'agent' => [
                 StartRequestAction::make(),
                 CompleteRequestAction::make(),

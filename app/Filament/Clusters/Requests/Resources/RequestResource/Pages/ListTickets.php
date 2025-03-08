@@ -8,6 +8,7 @@ use Filament\Facades\Filament;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class ListTickets extends ListRecords
 {
@@ -30,15 +31,29 @@ class ListTickets extends ListRecords
                     ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::SUBMITTED))
                     ->icon(! $outbound ? 'gmdi-inbox-o' : ActionStatus::SUBMITTED->getIcon())
                     ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::SUBMITTED)->count()),
+            ] : []),
+            'queued' => Tab::make('Queued')
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::QUEUED))
+                ->icon(ActionStatus::QUEUED->getIcon())
+                ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::QUEUED)->count()),
+            ...(in_array($panel, ['admin', 'moderator', 'root']) ? [
                 'assigned' => Tab::make('Assigned')
                     ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::ASSIGNED))
                     ->icon(ActionStatus::ASSIGNED->getIcon())
                     ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::ASSIGNED)->count()),
             ] : []),
-            'pending' => Tab::make('Pending')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::ASSIGNED))
-                ->icon('gmdi-hourglass-empty-o')
-                ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::ASSIGNED)->count()),
+            ...($panel !== 'root' && static::getResource()::$inbound ? [
+                'pending' => Tab::make('Pending')
+                    ->modifyQueryUsing(fn (Builder $query) => $query
+                        ->whereHas('assignees', fn ($query) => $query->where('assigned_id', Auth::id()))
+                        ->whereRelation('action', 'status', ActionStatus::ASSIGNED)
+                    )
+                    ->icon('gmdi-hourglass-empty-o')
+                    ->badge(fn () => $query()
+                        ->whereHas('assignees', fn ($query) => $query->where('assigned_id', Auth::id()))
+                        ->whereRelation('action', 'status', ActionStatus::ASSIGNED)->count()
+                    ),
+            ] : []),
             'processing' => Tab::make('Processing')
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::STARTED))
                 ->icon(ActionStatus::IN_PROGRESS->getIcon())

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "99188da735848ffebce650a44954e8dc",
+    "content-hash": "59f43fd292c0555a80bf3e0ac8386a82",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -480,6 +480,75 @@
                 }
             ],
             "time": "2025-01-03T16:18:33+00:00"
+        },
+        {
+            "name": "clue/socket-raw",
+            "version": "v1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clue/socket-raw.git",
+                "reference": "91e9f619f6769f931454a9882c21ffd7623d06cb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clue/socket-raw/zipball/91e9f619f6769f931454a9882c21ffd7623d06cb",
+                "reference": "91e9f619f6769f931454a9882c21ffd7623d06cb",
+                "shasum": ""
+            },
+            "require": {
+                "ext-sockets": "*",
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.3 || ^5.7 || ^4.8.35"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Socket\\Raw\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@clue.engineering"
+                }
+            ],
+            "description": "Simple and lightweight OOP wrapper for PHP's low-level sockets extension (ext-sockets).",
+            "homepage": "https://github.com/clue/socket-raw",
+            "keywords": [
+                "Socket",
+                "client",
+                "datagram",
+                "dgram",
+                "icmp",
+                "ipv6",
+                "server",
+                "stream",
+                "tcp",
+                "udg",
+                "udp",
+                "unix"
+            ],
+            "support": {
+                "issues": "https://github.com/clue/socket-raw/issues",
+                "source": "https://github.com/clue/socket-raw/tree/v1.6.0"
+            },
+            "funding": [
+                {
+                    "url": "https://clue.engineering/support",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/clue",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-04-14T14:58:06+00:00"
         },
         {
             "name": "codeat3/blade-google-material-design-icons",
@@ -6357,6 +6426,68 @@
             "time": "2025-02-06T14:58:20+00:00"
         },
         {
+            "name": "sunspikes/clamav-validator",
+            "version": "v1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sunspikes/clamav-validator.git",
+                "reference": "66cbb8c203fbfc60a9ffa633bae6e5f5fcca93c6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sunspikes/clamav-validator/zipball/66cbb8c203fbfc60a9ffa633bae6e5f5fcca93c6",
+                "reference": "66cbb8c203fbfc60a9ffa633bae6e5f5fcca93c6",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": ">=4.2",
+                "illuminate/validation": ">=4.1.21",
+                "php": ">=5.4.0",
+                "xenolope/quahog": "2.*"
+            },
+            "require-dev": {
+                "mockery/mockery": "0.9.*",
+                "phpunit/phpunit": "4.*",
+                "scrutinizer/ocular": "dev-master"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Sunspikes\\ClamavValidator\\ClamavValidatorServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Sunspikes\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Krishnaprasad MG",
+                    "email": "sunspikes@gmail.com"
+                }
+            ],
+            "description": "Custom Laravel 5 anti-virus validator for file uploads.",
+            "homepage": "https://github.com/sunspikes/clamav-validator",
+            "keywords": [
+                "clamav",
+                "laravel",
+                "validator",
+                "virus"
+            ],
+            "support": {
+                "issues": "https://github.com/sunspikes/clamav-validator/issues",
+                "source": "https://github.com/sunspikes/clamav-validator/tree/master"
+            },
+            "time": "2018-09-03T07:32:15+00:00"
+        },
+        {
             "name": "symfony/clock",
             "version": "v7.2.0",
             "source": {
@@ -9006,6 +9137,51 @@
                 "source": "https://github.com/webmozarts/assert/tree/1.11.0"
             },
             "time": "2022-06-03T18:03:27+00:00"
+        },
+        {
+            "name": "xenolope/quahog",
+            "version": "v2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jonjomckay/quahog.git",
+                "reference": "925dad6486a386406d17d0254f0095b595247170"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jonjomckay/quahog/zipball/925dad6486a386406d17d0254f0095b595247170",
+                "reference": "925dad6486a386406d17d0254f0095b595247170",
+                "shasum": ""
+            },
+            "require": {
+                "clue/socket-raw": "^1.2",
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "^1.6",
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Xenolope\\Quahog\\": "src/Quahog"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jonjo McKay",
+                    "email": "jonjo@jonjomckay.com"
+                }
+            ],
+            "description": "A PHP client library for ClamAV clamd daemon",
+            "support": {
+                "issues": "https://github.com/jonjomckay/quahog/issues",
+                "source": "https://github.com/jonjomckay/quahog/tree/v2.1.1"
+            },
+            "time": "2020-11-24T16:11:04+00:00"
         }
     ],
     "packages-dev": [

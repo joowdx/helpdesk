@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Storage;
 
 class Action extends Model
 {
@@ -27,6 +28,15 @@ class Action extends Model
         'status' => ActionStatus::class,
         'resolution' => ActionResolution::class,
     ];
+
+    public static function booted(): void
+    {
+        static::deleting(function (self $action) {
+            $action->attachment?->delete();
+
+            Storage::deleteDirectory("attachments/{$action->request_id}");
+        });
+    }
 
     public function attachment(): MorphOne
     {

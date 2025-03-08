@@ -10,7 +10,7 @@ class TagFilter extends SelectFilter
     {
         $filterClass = static::class;
 
-        $name ??= 'role-filter';
+        $name ??= 'tag-filter';
 
         $static = app($filterClass, ['name' => $name]);
 
@@ -27,6 +27,7 @@ class TagFilter extends SelectFilter
 
         $this->relationship('tags', 'name')
             ->multiple()
-            ->preload();
+            ->preload()
+            ->placeholder('Select tags');
     }
 }

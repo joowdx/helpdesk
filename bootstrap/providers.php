@@ -10,4 +10,7 @@ return [
     App\Providers\Filament\RootPanelProvider::class,
     App\Providers\Filament\UserPanelProvider::class,
     App\Providers\MacroServiceProvider::class,
+
+    // ClamAV
+    \Sunspikes\ClamavValidator\ClamavValidatorServiceProvider::class,
 ];

@@ -5,10 +5,11 @@ namespace App\Filament\Actions\Tables;
 use App\Enums\ActionStatus;
 use App\Models\Request;
 use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Auth;
 
 class UndoRecentAction extends Action
 {
-    private static int $duration = 15;
+    private static int $duration = 100;
 
     private static array $undoable = [
         ActionStatus::COMPLETED,
@@ -21,7 +22,7 @@ class UndoRecentAction extends Action
 
         $this->name('undo-recent-action-request');
 
-        $this->label(fn (Request $request) => "Un{$request->action->status->getLabel('presentTense', false)}");
+        $this->label('Undo');
 
         $this->icon('gmdi-change-circle-o');
 
@@ -31,7 +32,7 @@ class UndoRecentAction extends Action
 
         $this->modalHeading(fn (Request $request) => "Undo {$request->action->status->getLabel('nounForm', false)}");
 
-        $this->modalDescription(fn (Request $request) => "For ".static::$duration." minutes, you are allowed to undo your recent action. Are you sure you want to undo the {$request->action->status->getLabel('nounForm', false)}?");
+        $this->modalDescription(fn (Request $request) => 'For '.static::$duration." minutes, you are allowed to undo your recent action. Are you sure you want to undo the {$request->action->status->getLabel('nounForm', false)}?");
 
         $this->successNotificationTitle(fn (Request $request) => "Request {$request->action->status->getLabel('nounForm', false)} undone");
 
@@ -40,14 +41,14 @@ class UndoRecentAction extends Action
                 return;
             }
 
-            $request->action()->delete();
+            $request->action->delete();
 
             $this->sendSuccessNotification();
         });
 
-        $this->visible(fn (Request $request) =>
-            in_array($request->action->status, static::$undoable) &&
-            $request->action->created_at->addMinutes(static::$duration)->greaterThan(now())
+        $this->visible(fn (Request $request) => in_array($request->action->status, static::$undoable) &&
+            $request->action->created_at->addMinutes(static::$duration)->greaterThan(now()) &&
+            $request->action->user_id === Auth::id(),
         );
     }
 }

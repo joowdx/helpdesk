@@ -35,10 +35,12 @@ class ListInquiries extends ListRecords
                     ->icon(ActionStatus::ASSIGNED->getIcon())
                     ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::ASSIGNED)->count()),
             ] : []),
-            'pending' => Tab::make('Pending')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::ASSIGNED))
-                ->icon('gmdi-hourglass-empty-o')
-                ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::ASSIGNED)->count()),
+            ...($panel !== 'root' ? [
+                'pending' => Tab::make('Pending')
+                    ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::ASSIGNED))
+                    ->icon('gmdi-hourglass-empty-o')
+                    ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::ASSIGNED)->count()),
+            ] : []),
             'processing' => Tab::make('Processing')
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::RESPONDED))
                 ->icon(ActionStatus::IN_PROGRESS->getIcon())
