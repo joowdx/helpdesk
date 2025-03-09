@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Panels\Moderator\Actions\Tables;
+namespace App\Filament\Actions\Tables;
 
 use App\Enums\ActionStatus;
 use App\Models\Request;

@@ -4,6 +4,8 @@ namespace App\Filament\Panels\User\Resources\OrganizationResource\Concerns;
 
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
+use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
+use App\Filament\Forms\FileAttachment;
 use App\Filament\Panels\User\Resources\RequestResource;
 use App\Models\Request;
 use Filament\Actions\Action;
@@ -14,6 +16,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Support\Concerns\EvaluatesClosures;
 use Filament\Support\Facades\FilamentView;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +26,10 @@ use function Filament\Support\is_app_url;
 
 trait NewRequest
 {
+    use CanNotifyUsers, EvaluatesClosures;
+
+    protected static ?ActionStatus $requestAction = ActionStatus::SUBMITTED;
+
     public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
@@ -131,6 +138,7 @@ trait NewRequest
                                 RequestClass::SUGGESTION => 'your idea, explaining its benefits and potential impact.',
                                 RequestClass::TICKET => 'the issue, including any steps to reproduce it and relevant details.',
                             }),
+                        FileAttachment::make(),
                     ]),
             ]);
     }
@@ -168,6 +176,15 @@ trait NewRequest
         $request->save();
 
         $request->actions()->create(['user_id' => Auth::id(), 'status' => ActionStatus::SUBMITTED]);
+
+        if (count($data['files']) > 0) {
+            $request->attachment()->create([
+                'files' => $data['files'],
+                'paths' => $data['paths'],
+            ]);
+        }
+
+        $this->notifyUsers($request);
 
         return $request;
     }

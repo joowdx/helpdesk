@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Panels\Moderator\Actions\Tables;
+namespace App\Filament\Actions\Tables;
 
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Enums\UserRole;
+use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
 use App\Models\Request;
 use App\Models\User;
 use Exception;
@@ -18,11 +19,15 @@ use Illuminate\Support\Facades\Auth;
 
 class AssignRequestAction extends Action
 {
+    use CanNotifyUsers;
+
+    protected static ?ActionStatus $requestAction = ActionStatus::ASSIGNED;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->name('assign');
+        $this->name('assign-request');
 
         $this->label(fn (Request $request) => $request->action->status === ActionStatus::ASSIGNED ? 'Reassign' : 'Assign');
 
@@ -45,6 +50,8 @@ class AssignRequestAction extends Action
         $this->modalSubmitActionLabel('Assign');
 
         $this->successNotificationTitle(fn (Request $request) => $request->action->status === ActionStatus::ASSIGNED ? 'Request reassigned' : 'Request assigned');
+
+        $this->failureNotificationTitle('Failed to assign request');
 
         $this->fillForm(fn (Request $request) => [
             'declination' => $request->declination,
@@ -116,15 +123,15 @@ class AssignRequestAction extends Action
                     }),
                 );
 
-                $this->success();
-
                 $this->commitDatabaseTransaction();
-            } catch (Exception $exception) {
+
+                $this->sendSuccessNotification();
+
+                $this->notifyUsers();
+            } catch (Exception) {
                 $this->rollBackDatabaseTransaction();
 
-                $this->failure();
-
-                throw $exception;
+                $this->sendFailureNotification();
             }
         });
 
@@ -132,6 +139,7 @@ class AssignRequestAction extends Action
             return match ($request->class) {
                 RequestClass::TICKET => in_array($request->action->status, [ActionStatus::QUEUED, ActionStatus::ASSIGNED]),
                 RequestClass::INQUIRY => in_array($request->action->status, [ActionStatus::RESPONDED, ActionStatus::SUBMITTED, ActionStatus::ASSIGNED]),
+                RequestClass::SUGGESTION => in_array($request->action->status, [ActionStatus::SUBMITTED, ActionStatus::ASSIGNED]),
                 default => false,
             };
         });

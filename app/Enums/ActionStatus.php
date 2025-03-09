@@ -37,10 +37,10 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
     case RECATEGORIZED = 'recategorized';
     case RESPONDED = 'responded';
     case TAGGED = 'tagged';
+    case ACKNOWLEDGED = 'acknowledged';
 
     case ON_HOLD = 'on_hold';           // Placeholder only
     case IN_PROGRESS = 'in_progress';   // Placeholder only
-    case PENDING = 'pending';           // Placeholder only
 
     public static function allowedTransitions(): array
     {
@@ -193,6 +193,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::REOPENED => 'gmdi-replay-o',
             self::TAGGED => 'gmdi-sell-o',
             self::RESPONDED => 'gmdi-chat-o',
+            self::ACKNOWLEDGED => 'gmdi-done-all-o',
             self::IN_PROGRESS => 'gmdi-sync-o',
             self::ON_HOLD => 'gmdi-pause-o',
             default => 'gmdi-circle-o',

@@ -40,7 +40,8 @@ class FileAttachment extends Section
                 ->helperText(function () {
                     $html = <<<'HTML'
                         <span class="text-sm text-custom-600 dark:text-custom-400" style="--c-400:var(--warning-400);--c-600:var(--warning-600);">
-                            Files are stored for a maximum of sixty days and will be deleted after that period.
+                            Attachments are <b>deleted</b> after a certain period of time.
+                            Please <b>secure your files</b> somewhere else first if you intend to keep them long-term.
                         </span>
                     HTML;
 

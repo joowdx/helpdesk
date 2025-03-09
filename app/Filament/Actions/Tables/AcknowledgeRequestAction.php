@@ -2,7 +2,9 @@
 
 namespace App\Filament\Actions\Tables;
 
+use App\Enums\ActionResolution;
 use App\Enums\ActionStatus;
+use App\Enums\RequestClass;
 use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
 use App\Filament\Forms\FileAttachment;
 use App\Models\Request;
@@ -12,41 +14,40 @@ use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
-class CompleteRequestAction extends Action
+class AcknowledgeRequestAction extends Action
 {
     use CanNotifyUsers;
 
-    protected static ?ActionStatus $requestAction = ActionStatus::COMPLETED;
+    protected static ?ActionStatus $requestAction = ActionStatus::CLOSED;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->name('complete-request');
+        $this->name('acknowledge-request');
 
-        $this->label('Complete');
+        $this->label('Acknowledge');
 
         $this->slideOver();
 
-        $this->icon(ActionStatus::COMPLETED->getIcon());
+        $this->icon(ActionStatus::ACKNOWLEDGED->getIcon());
 
-        $this->modalIcon(ActionStatus::COMPLETED->getIcon());
+        $this->modalIcon(ActionStatus::ACKNOWLEDGED->getIcon());
 
-        $this->modalHeading('Complete Request');
+        $this->modalHeading('Acknowledge Request');
 
-        $this->modalDescription('Mark this request as completed. Requester may reopen this request if needed.');
-
-        $this->modalWidth(MaxWidth::ExtraLarge);
+        $this->modalDescription('Close and acknowledge this request.');
 
         $this->modalSubmitActionLabel('Confirm');
 
-        $this->successNotificationTitle('Request completed');
+        $this->modalWidth(MaxWidth::ExtraLarge);
 
-        $this->failureNotificationTitle('Request completion failed');
+        $this->successNotificationTitle('Request acknowledged');
+
+        $this->failureNotificationTitle('Request acknowledgement failed');
 
         $this->form([
             MarkdownEditor::make('remarks')
-                ->helperText('Please describe the reason for suspending this request.')
                 ->required(),
             FileAttachment::make(),
         ]);
@@ -56,9 +57,10 @@ class CompleteRequestAction extends Action
                 $this->beginDatabaseTransaction();
 
                 $action = $request->actions()->create([
-                    'status' => ActionStatus::COMPLETED,
+                    'status' => ActionStatus::CLOSED,
                     'user_id' => Auth::id(),
                     'remarks' => $data['remarks'],
+                    'resolution' => ActionResolution::ACKNOWLEDGED,
                 ]);
 
                 if (count($data['files']) > 0) {
@@ -80,8 +82,8 @@ class CompleteRequestAction extends Action
             }
         });
 
-        $this->closeModalByClickingAway(false);
+        $this->hidden(fn (Request $record) => $record->action->status === ActionStatus::CLOSED);
 
-        $this->visible(fn (Request $request) => in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::REOPENED]));
+        $this->visible(fn (Request $record) => $record->class === RequestClass::SUGGESTION);
     }
 }

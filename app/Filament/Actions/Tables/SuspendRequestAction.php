@@ -4,7 +4,10 @@ namespace App\Filament\Actions\Tables;
 
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
+use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
+use App\Filament\Forms\FileAttachment;
 use App\Models\Request;
+use Exception;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Actions\Action;
@@ -12,6 +15,10 @@ use Illuminate\Support\Facades\Auth;
 
 class SuspendRequestAction extends Action
 {
+    use CanNotifyUsers;
+
+    protected static ?ActionStatus $requestAction = ActionStatus::SUSPENDED;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -38,11 +45,14 @@ class SuspendRequestAction extends Action
 
         $this->successNotificationTitle('Request suspended');
 
+        $this->failureNotificationTitle('Failed to suspend request');
+
         $this->form([
             MarkdownEditor::make('remarks')
                 ->label('Reason')
                 ->required()
                 ->helperText('Please describe the reason for suspending this request.'),
+            FileAttachment::make(),
         ]);
 
         $this->action(function (Request $request, array $data) {
@@ -50,13 +60,32 @@ class SuspendRequestAction extends Action
                 return;
             }
 
-            $request->actions()->create([
-                'status' => ActionStatus::SUSPENDED,
-                'user_id' => Auth::id(),
-                'remarks' => $data['remarks'],
-            ]);
+            try {
+                $this->beginDatabaseTransaction();
 
-            $this->sendSuccessNotification();
+                $action = $request->actions()->create([
+                    'status' => ActionStatus::SUSPENDED,
+                    'user_id' => Auth::id(),
+                    'remarks' => $data['remarks'],
+                ]);
+
+                if (count($data['files']) > 0) {
+                    $action->attachment()->create([
+                        'files' => $data['files'],
+                        'paths' => $data['paths'],
+                    ]);
+                }
+
+                $this->commitDatabaseTransaction();
+
+                $this->sendSuccessNotification();
+
+                $this->notifyUsers();
+            } catch (Exception) {
+                $this->rollbackDatabaseTransaction();
+
+                $this->sendFailureNotification();
+            }
         });
 
         $this->visible(function (Request $request) {

@@ -4,6 +4,8 @@ namespace App\Filament\Actions\Tables;
 
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
+use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
+use App\Filament\Forms\FileAttachment;
 use App\Models\Request;
 use Exception;
 use Filament\Facades\Filament;
@@ -16,6 +18,10 @@ use Illuminate\Support\Facades\Blade;
 
 class RespondRequestAction extends Action
 {
+    use CanNotifyUsers;
+
+    protected static ?ActionStatus $requestAction = ActionStatus::RESPONDED;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -43,6 +49,8 @@ class RespondRequestAction extends Action
             return 'You have responded to '.$pronoun.' inquiry <span class="font-mono">#'.$request->code.'</span>';
         });
 
+        $this->failureNotificationTitle('An error occurred while responding to this inquiry');
+
         $this->form(fn (Request $request) => [
             Placeholder::make('tags')
                 ->content(function () use ($request) {
@@ -69,6 +77,7 @@ class RespondRequestAction extends Action
             MarkdownEditor::make('response')
                 ->label('Message')
                 ->required(),
+            FileAttachment::make(),
             Placeholder::make('responses')
                 ->hidden($request->actions()->where('status', ActionStatus::RESPONDED)->doesntExist())
                 ->content(view('filament.requests.history', [
@@ -78,9 +87,8 @@ class RespondRequestAction extends Action
             Placeholder::make('subject')
                 ->content($request->subject),
             Placeholder::make('inquiry')
-                ->content(view('filament.requests.action', [
-                    'content' => $request->body,
-                    'chat' => true,
+                ->content(view('filament.requests.show', [
+                    'request' => $request,
                 ])),
         ]);
 
@@ -88,15 +96,24 @@ class RespondRequestAction extends Action
             try {
                 $this->beginDatabaseTransaction();
 
-                $request->actions()->create([
+                $action = $request->actions()->create([
                     'remarks' => $data['response'],
                     'status' => ActionStatus::RESPONDED,
                     'user_id' => Auth::id(),
                 ]);
 
-                $this->success();
+                if (count($data['files']) > 0) {
+                    $action->attachment()->create([
+                        'files' => $data['files'],
+                        'paths' => $data['paths'],
+                    ]);
+                }
 
                 $this->commitDatabaseTransaction();
+
+                $this->success();
+
+                $this->notifyUsers();
             } catch (Exception) {
                 $this->rollBackDatabaseTransaction();
 

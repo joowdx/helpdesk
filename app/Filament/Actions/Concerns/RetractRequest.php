@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 
 trait RetractRequest
 {
+    private static int $duration = 15;
+
     protected function bootRetractRequest()
     {
         $this->name('retract-request');
@@ -18,7 +20,7 @@ trait RetractRequest
 
         $this->modalHeading('Retract request');
 
-        $this->modalDescription('This will allow you to make changes before resubmitting. Are you sure you want to retract this request?');
+        $this->modalDescription('For ' . static::$duration.' minutes since the last submission, you can cancel it. This will allow you to make changes before resubmitting. Are you sure you want to recall this request?');
 
         $this->modalIcon(ActionStatus::RETRACTED->getIcon());
 
@@ -30,6 +32,6 @@ trait RetractRequest
             $this->sendSuccessNotification();
         });
 
-        $this->visible(fn (Request $request) => $request->action?->status === ActionStatus::SUBMITTED);
+        $this->visible(fn (Request $request) => $request->action?->status === ActionStatus::SUBMITTED && $request->action->created_at->addMinutes(static::$duration)->greaterThan(now()));
     }
 }

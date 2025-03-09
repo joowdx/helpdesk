@@ -28,14 +28,10 @@ class ListTickets extends ListRecords
                 ->badge(fn () => $query()->count()),
             ...(in_array($panel, ['admin', 'moderator', 'root']) ? [
                 $outbound ? 'submitted' : 'received' => Tab::make($outbound ? 'Submitted' : 'Received')
-                    ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::SUBMITTED))
+                    ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::SUBMITTED)->orWhereRelation('action', 'status', ActionStatus::QUEUED))
                     ->icon(! $outbound ? 'gmdi-inbox-o' : ActionStatus::SUBMITTED->getIcon())
-                    ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::SUBMITTED)->count()),
+                    ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::SUBMITTED)->orWhereRelation('action', 'status', ActionStatus::QUEUED)->count()),
             ] : []),
-            'queued' => Tab::make('Queued')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::QUEUED))
-                ->icon(ActionStatus::QUEUED->getIcon())
-                ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::QUEUED)->count()),
             ...(in_array($panel, ['admin', 'moderator', 'root']) ? [
                 'assigned' => Tab::make('Assigned')
                     ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::ASSIGNED))

@@ -159,9 +159,13 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         });
     }
 
-    public function scopeModerator(Builder $query): Builder
+    public function scopeModerator(Builder $query, bool $admin = false): Builder
     {
-        return $query->where('role', UserRole::MODERATOR);
+        return $query->where(function ($query) use ($admin) {
+            $query->where('role', UserRole::MODERATOR);
+
+            $query->when($admin, fn ($query) => $query->orWhere('role', UserRole::ADMIN));
+        });
     }
 
     public function scopeAdmin(Builder $query): Builder

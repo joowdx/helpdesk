@@ -60,9 +60,8 @@ trait ShowRequest
             ViewEntry::make('body')
                 ->label('Inquiry')
                 ->hiddenLabel(false)
-                ->view('filament.requests.action', [
-                    'content' => $request->body,
-                    'chat' => true,
+                ->view('filament.requests.show', [
+                    'request' => $request,
                 ]),
             ViewEntry::make('responses')
                 ->visible($request->class === RequestClass::INQUIRY)

@@ -5,7 +5,7 @@
 @php($re ??= false)
 
 <div>
-    @if (isset($action) && ! isset($content))
+    @if (isset($action))
         <span
             class='absolute flex items-center justify-center w-6 h-6 bg-white rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-gray-900'
             @style(['color:'.ColorToHex::convert($action->status->getColor())])
@@ -45,33 +45,38 @@
 
             {{ $action->created_at->format('jS \of F Y \a\t H:i') }}
         </time>
-    @endif
 
-    @if ($content ?? $action->remarks)
-        @if ($chat || in_array($action->status, [ActionStatus::TAGGED, ActionStatus::ASSIGNED, ActionStatus::RECATEGORIZED, ActionStatus::RECLASSIFIED]))
-            <div class="prose max-w-none dark:prose-invert [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 prose-sm text-sm leading-6 text-gray-950 dark:text-white">
-                {{ str($content ?? $action->remarks)->when($content ?? $action->status !== ActionStatus::TAGGED, fn ($remarks) => $remarks->markdown())->toHtmlString() }}
-            </div>
-        @else
-            <div class="p-3 text-base bg-gray-100 rounded-md dark:bg-gray-800">
-                <span class="text-sm text-neutral-500">
-                    <x-filament::icon class="inline size-6" icon="gmdi-format-quote-o" />
-                </span>
-
+        @if ($action->remarks)
+            @if ($chat || in_array($action->status, [ActionStatus::TAGGED, ActionStatus::ASSIGNED, ActionStatus::RECATEGORIZED, ActionStatus::RECLASSIFIED]))
                 <div class="prose max-w-none dark:prose-invert [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 prose-sm text-sm leading-6 text-gray-950 dark:text-white">
-                    {{ str($content ?? $action->remarks)->when($content ?? $action->status !== ActionStatus::TAGGED, fn ($remarks) => $remarks->markdown())->toHtmlString() }}
+                    {{ str($action->remarks)->when($action->status !== ActionStatus::TAGGED, fn ($remarks) => $remarks->markdown()->sanitizeHtml())->toHtmlString() }}
                 </div>
-            </div>
+            @else
+                <div class="p-3 text-base bg-gray-100 rounded-md dark:bg-gray-800">
+                    <span class="text-sm text-neutral-500">
+                        <x-filament::icon class="inline size-6" icon="gmdi-format-quote-o" />
+                    </span>
+
+                    <div class="prose max-w-none dark:prose-invert [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 prose-sm text-sm leading-6 text-gray-950 dark:text-white">
+                        {{ str($action->remarks)->when($action->status !== ActionStatus::TAGGED, fn ($remarks) => $remarks->markdown()->sanitizeHtml())->toHtmlString() }}
+                    </div>
+                </div>
+            @endif
         @endif
-    @endif
 
-    @if ($action instanceof \App\Models\Action && $action->attachment?->paths->isNotEmpty())
-        <div class="p-3 space-y-2 text-base bg-gray-100 rounded-md dark:bg-gray-800 mt-4 overflow-hidden">
-            <span class="text-sm text-neutral-500">
-                <x-filament::icon class="inline size-6" icon="gmdi-attachment-o" />
-            </span>
-
-            @include('filament.requests.attachment', ['attachment' => $action->attachment])
-        </div>
+        @if ($action->attachment?->paths->isNotEmpty())
+            @if ($chat)
+                <div class="mt-4">
+                    @include('filament.requests.attachment', ['attachment' => $action->attachment])
+                </div>
+            @else
+                <div class="p-3 space-y-2 text-base bg-gray-100 rounded-md dark:bg-gray-800 mt-4 overflow-hidden">
+                    <span class="text-sm text-neutral-500">
+                        <x-filament::icon class="inline size-6" icon="gmdi-attachment-o" />
+                    </span>
+                    @include('filament.requests.attachment', ['attachment' => $action->attachment])
+                </div>
+            @endif
+        @endif
     @endif
 </div>

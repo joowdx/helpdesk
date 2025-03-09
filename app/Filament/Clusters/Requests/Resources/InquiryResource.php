@@ -3,6 +3,7 @@
 namespace App\Filament\Clusters\Requests\Resources;
 
 use App\Enums\RequestClass;
+use App\Filament\Actions\Tables\AssignRequestAction;
 use App\Filament\Actions\Tables\CloseRequestAction;
 use App\Filament\Actions\Tables\CompleteRequestAction;
 use App\Filament\Actions\Tables\RecategorizeRequestAction;
@@ -12,7 +13,6 @@ use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries;
-use App\Filament\Panels\Moderator\Actions\Tables\AssignRequestAction;
 use App\Filament\Resources\RequestResource;
 use Filament\Facades\Filament;
 use Filament\Tables\Actions\ActionGroup;

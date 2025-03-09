@@ -1,10 +1,13 @@
 <?php
 
-namespace App\Filament\Panels\Agent\Actions\Tables;
+namespace App\Filament\Actions\Tables;
 
 use App\Enums\ActionStatus;
 use App\Enums\UserRole;
+use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
+use App\Filament\Forms\FileAttachment;
 use App\Models\Request;
+use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Support\Enums\MaxWidth;
@@ -13,11 +16,15 @@ use Illuminate\Support\Facades\Auth;
 
 class RequeueRequestAction extends Action
 {
+    use CanNotifyUsers;
+
+    protected static ?ActionStatus $requestAction = ActionStatus::REJECTED;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->name('requeue');
+        $this->name('requeue-request');
 
         $this->slideOver();
 
@@ -25,16 +32,19 @@ class RequeueRequestAction extends Action
 
         $this->modalIcon(ActionStatus::QUEUED->getIcon());
 
-        $this->modalDescription('Please provide a valid reason for requeueing this request.');
+        $this->modalDescription('Please provide a valid reason for rejecting and requeueing this request.');
 
         $this->modalWidth(MaxWidth::ExtraLarge);
 
-        $this->successNotificationTitle('Requeued');
+        $this->successNotificationTitle('Request rejected and requeued');
+
+        $this->failureNotificationTitle('Request rejection and requeue failed');
 
         $this->form([
             MarkdownEditor::make('remarks')
                 ->label('Reason')
                 ->required(Filament::getCurrentPanel()->getId() === 'agent'),
+            FileAttachment::make(),
         ]);
 
         $this->action(function (Request $request, array $data) {
@@ -42,15 +52,34 @@ class RequeueRequestAction extends Action
                 return;
             }
 
-            $request->assignees()->detach();
+            try {
+                $this->beginDatabaseTransaction();
 
-            $request->actions()->create([
-                'remarks' => $data['remarks'],
-                'status' => ActionStatus::QUEUED,
-                'user_id' => Auth::id(),
-            ]);
+                $request->assignees()->detach();
 
-            $this->sendSuccessNotification();
+                $action = $request->actions()->create([
+                    'remarks' => $data['remarks'],
+                    'status' => ActionStatus::QUEUED,
+                    'user_id' => Auth::id(),
+                ]);
+
+                if (count($data['files']) > 0) {
+                    $action->attachment()->create([
+                        'files' => $data['files'],
+                        'paths' => $data['paths'],
+                    ]);
+                }
+
+                $this->commitDatabaseTransaction();
+
+                $this->sendSuccessNotification();
+
+                $this->notifyUsers();
+            } catch (Exception) {
+                $this->rollBackDatabaseTransaction();
+
+                $this->sendFailureNotification();
+            }
         });
 
         $this->closeModalByClickingAway(false);
