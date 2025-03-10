@@ -63,7 +63,7 @@ class AssignRequestAction extends Action
                 ->label('Allow declination')
                 ->helperText('Allow assignees to have the option to decline the assignment')
                 ->default(true),
-            MarkdownEditor::make('remarks'),
+            // MarkdownEditor::make('remarks'),
             CheckboxList::make('assignees')
                 ->required()
                 ->searchable()
@@ -107,7 +107,7 @@ class AssignRequestAction extends Action
                     'remarks' => User::select('id')
                         ->find($data['assignees'])
                         ->map(fn (User $user) => ['id' => "* {$user->id}"])
-                        ->implode('id', "\n")."\n\n".$data['remarks'],
+                        // ->implode('id', "\n")."\n\n".$data['remarks'],
                 ]);
 
                 $request->assignees()->sync(
