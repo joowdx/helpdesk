@@ -81,7 +81,7 @@ class ListSubcategories extends ManageRelatedRecords
                         ->default($this->record->getKey())
                         ->hidden()
                         ->dehydratedWhenHidden(),
-                    ...$form->getComponents(),
+                    ...$this->form($form)->getComponents(),
                 ]),
         ];
     }

@@ -8,6 +8,7 @@ use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
 use App\Filament\Forms\FileAttachment;
 use App\Filament\Panels\User\Resources\RequestResource;
 use App\Models\Request;
+use App\Models\Subcategory;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\Group;
@@ -107,10 +108,18 @@ trait NewRequest
                             ->options($subcategories)
                             ->required()
                             ->placeholder(null)
+                            ->live()
                             ->helperText(fn () => 'Choose the most relevant category for '.match ($classification) {
                                 RequestClass::INQUIRY => 'your question or request for information.',
                                 RequestClass::SUGGESTION => 'your idea or feedback.',
                                 RequestClass::TICKET => 'the issue you are reporting.',
+                            })
+                            ->afterStateUpdated(function ($state, $set) use ($classification) {
+                                $template = Subcategory::find($state)->{$classification->value.'Template'}()->first();
+
+                                if ($template) {
+                                    $set('body', $template->content);
+                                }
                             }),
                         TextInput::make('subject')
                             ->rule('required')
