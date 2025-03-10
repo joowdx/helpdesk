@@ -7,7 +7,6 @@ use App\Models\Request;
 use App\Models\User;
 use Filament\Actions\Concerns\CanCustomizeProcess;
 use Filament\Notifications\Notification;
-use Filament\Support\Concerns\EvaluatesClosures;
 use Illuminate\Contracts\Auth\Authenticatable;
 use ReflectionClass;
 
@@ -46,7 +45,7 @@ trait CanNotifyUsers
                 ActionStatus::COMPLIED => "{$request->class->getLabel()} request #{$request->code} complied",
                 ActionStatus::COMPLETED => "{$request->class->getLabel()} request #{$request->code} completed",
                 ActionStatus::REJECTED => "{$request->class->getLabel()} request assignment rejected",
-                ActionStatus::RESPONDED => "$authenticated->name has responded to " . ($authenticated->id !== $request->user_id ? 'your' : 'their') . " inquiry #{$request->code}.",
+                ActionStatus::RESPONDED => "$authenticated->name has responded to ".($authenticated->id !== $request->user_id ? 'your' : 'their')." inquiry #{$request->code}.",
                 default => null,
             };
 

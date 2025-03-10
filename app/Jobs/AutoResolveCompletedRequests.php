@@ -42,6 +42,7 @@ class AutoResolveCompletedRequests implements ShouldQueue
                         $request->actions()->create([
                             'status' => ActionStatus::CLOSED,
                             'resolution' => ActionResolution::RESOLVED,
+                            'system' => true,
                         ]);
                     });
             }

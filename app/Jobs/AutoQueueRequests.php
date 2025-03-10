@@ -40,6 +40,7 @@ class AutoQueueRequests implements ShouldQueue
                     ->each(function (Request $request) {
                         $request->actions()->create([
                             'status' => ActionStatus::QUEUED,
+                            'system' => true,
                         ]);
                     });
             }

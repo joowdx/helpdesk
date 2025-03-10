@@ -20,7 +20,7 @@ trait RetractRequest
 
         $this->modalHeading('Retract request');
 
-        $this->modalDescription('For ' . static::$duration.' minutes since the last submission, you can cancel it. This will allow you to make changes before resubmitting. Are you sure you want to recall this request?');
+        $this->modalDescription('For '.static::$duration.' minutes since the last submission, you can cancel it. This will allow you to make changes before resubmitting. Are you sure you want to recall this request?');
 
         $this->modalIcon(ActionStatus::RETRACTED->getIcon());
 

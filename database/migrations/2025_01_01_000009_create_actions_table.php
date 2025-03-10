@@ -19,8 +19,11 @@ return new class extends Migration
             $table->string('status')->nullable();
             $table->text('remarks')->nullable();
             $table->string('resolution')->default('');
-            $table->check("status = '".ActionStatus::CLOSED->value."' OR resolution = ''");
+            $table->boolean('system')->default(false);
+            $table->boolean('check')->virtualAs("(`status` = 'closed' OR `resolution` = '') AND ((`system` = 1 AND `user_id` IS NULL) OR (`system` = 0))");
             $table->timestamps();
+
+            $table->check("`check` = 1", 'actions_check');
         });
     }
 

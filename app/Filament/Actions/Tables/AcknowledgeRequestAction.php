@@ -30,9 +30,9 @@ class AcknowledgeRequestAction extends Action
 
         $this->slideOver();
 
-        $this->icon(ActionStatus::ACKNOWLEDGED->getIcon());
+        $this->icon(ActionResolution::ACKNOWLEDGED->getIcon());
 
-        $this->modalIcon(ActionStatus::ACKNOWLEDGED->getIcon());
+        $this->modalIcon(ActionResolution::ACKNOWLEDGED->getIcon());
 
         $this->modalHeading('Acknowledge Request');
 
