@@ -243,7 +243,7 @@
                                                     </span>
                                                     <div class="p-1 rounded-full size-7 ring-4 ring-gray-50 dark:ring-gray-950 bg-gray-50 dark:bg-gray-950">
                                                         <x-filament::icon
-                                                            :icon="App\Enums\ActionStatus::RESOLVED->getIcon()"
+                                                            :icon="App\Enums\ActionResolution::RESOLVED->getIcon()"
                                                             class="text-amber-500"
                                                         />
                                                     </div>

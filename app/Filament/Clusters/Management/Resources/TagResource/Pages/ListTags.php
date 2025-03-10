@@ -8,6 +8,7 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class ListTags extends ListRecords
 {
@@ -19,7 +20,13 @@ class ListTags extends ListRecords
             Actions\CreateAction::make()
                 ->createAnother(false)
                 ->slideOver()
-                ->modalWidth(MaxWidth::Large),
+                ->modalWidth(MaxWidth::Large)
+                ->mutateFormDataUsing(function (array $data) {
+                    return [
+                        ...$data,
+                        'organization_id' => $data['organization_id'] ?? Auth::user()->organization_id,
+                    ];
+                }),
         ];
     }
 
