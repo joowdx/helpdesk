@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class UndoRecentAction extends Action
 {
-    private static int $duration = 100;
+    private static int $duration = 5;
 
     private static array $undoable = [
         ActionStatus::STARTED,
