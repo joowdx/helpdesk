@@ -78,7 +78,7 @@ class TagRequestAction extends Action
 
         $this->disabled(fn (Request $request) =>
             $request->action->status->finalized() &&
-            $request->action->created_at->addMonths(2)->greaterThan(now())
+            $request->action->created_at->addDays(90)->lessThan(now())
         );
     }
 }
