@@ -85,8 +85,6 @@ class Action extends Model
         if (count($id) === 1) {
             $user = User::find($id[0]);
 
-            dd($remarks, $user);
-
             return preg_replace_callback($pattern, fn () => 'To: '.($user->name ?? '*(<u>anonymous</u>)*'), $remarks);
         }
 
