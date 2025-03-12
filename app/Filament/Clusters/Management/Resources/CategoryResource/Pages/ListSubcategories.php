@@ -100,7 +100,7 @@ class ListSubcategories extends ManageRelatedRecords
                     ->dehydrateStateUsing(fn (?string $state) => mb_ucfirst($state ?? ''))
                     ->rule('required')
                     ->markAsRequired()
-                    ->maxLength(24),
+                    ->maxLength(48),
                 Forms\Components\Group::make()
                     ->relationship('inquiryTemplate')
                     ->mutateRelationshipDataBeforeCreateUsing(fn (array $data) => [...$data, 'class' => RequestClass::INQUIRY])

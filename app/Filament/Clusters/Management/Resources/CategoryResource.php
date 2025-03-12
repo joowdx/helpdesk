@@ -44,7 +44,7 @@ class CategoryResource extends Resource
                     ->label('Name')
                     ->columnSpanFull()
                     ->dehydrateStateUsing(fn (?string $state) => mb_ucfirst($state ?? ''))
-                    ->maxLength(36)
+                    ->maxLength(48)
                     ->rule('required')
                     ->markAsRequired()
                     ->unique(
@@ -61,7 +61,7 @@ class CategoryResource extends Resource
                     ->simple(
                         Forms\Components\TextInput::make('name')
                             ->distinct()
-                            ->maxLength(24)
+                            ->maxLength(48)
                             ->rule('required')
                             ->markAsRequired()
                     ),
