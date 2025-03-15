@@ -18,12 +18,15 @@ use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\UndoRecentAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListTickets;
+use App\Filament\Panels\User\Resources\OrganizationResource\Pages\NewTicket;
 use App\Filament\Resources\RequestResource;
 use Filament\Facades\Filament;
 use Filament\Tables\Actions\ActionGroup;
 
 class TicketResource extends RequestResource
 {
+    public static ?RequestClass $class = RequestClass::TICKET;
+
     protected static bool $shouldRegisterNavigation = true;
 
     protected static ?int $navigationSort = -2;
@@ -32,12 +35,11 @@ class TicketResource extends RequestResource
 
     protected static ?string $label = 'Tickets';
 
-    protected static ?RequestClass $class = RequestClass::TICKET;
-
     public static function getPages(): array
     {
         return [
             'index' => ListTickets::route('/'),
+            'new' => NewTicket::route('new/{record}'),
         ];
     }
 

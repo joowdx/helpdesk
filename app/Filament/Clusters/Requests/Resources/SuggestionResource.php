@@ -14,24 +14,26 @@ use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListSuggestions;
+use App\Filament\Panels\User\Resources\OrganizationResource\Pages\NewSuggestion;
 use App\Filament\Resources\RequestResource;
 use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Support\Facades\Auth;
 
 class SuggestionResource extends RequestResource
 {
+    public static ?RequestClass $class = RequestClass::SUGGESTION;
+
     protected static bool $shouldRegisterNavigation = true;
 
     protected static ?string $navigationIcon = 'heroicon-o-light-bulb';
 
     protected static ?string $label = 'Suggestions';
 
-    protected static ?RequestClass $class = RequestClass::SUGGESTION;
-
     public static function getPages(): array
     {
         return [
             'index' => ListSuggestions::route('/'),
+            'new' => NewSuggestion::route('new/{record}'),
         ];
     }
 

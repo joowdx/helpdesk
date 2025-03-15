@@ -9,6 +9,7 @@ use App\Filament\Forms\FileAttachment;
 use App\Filament\Panels\User\Resources\RequestResource;
 use App\Models\Request;
 use App\Models\Subcategory;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\Group;
@@ -39,7 +40,11 @@ trait NewRequest
 
         $this->fillForm();
 
-        $this->previousUrl = RequestResource::getUrl('index');
+        try {
+            $this->previousUrl = RequestResource::getUrl('index');
+        } catch (Exception) {
+            $this->previousUrl = null;
+        }
     }
 
     public function getHeaderActions(): array

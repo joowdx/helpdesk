@@ -4,6 +4,7 @@ namespace App\Filament\Clusters\Requests\Resources\RequestResource\Pages;
 
 use App\Enums\ActionStatus;
 use App\Filament\Clusters\Requests\Resources\TicketResource;
+use App\Filament\Panels\User\Actions\NewRequestPromptAction;
 use Filament\Facades\Filament;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
@@ -78,6 +79,14 @@ class ListTickets extends ListRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::CLOSED))
                 ->icon(ActionStatus::CLOSED->getIcon())
                 ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::CLOSED)->count()),
+        ];
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            NewRequestPromptAction::make()
+                ->class(static::getResource()::$class),
         ];
     }
 }

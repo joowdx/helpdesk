@@ -24,6 +24,8 @@ class RequestResource extends Resource
 {
     public static bool $inbound = true;
 
+    public static ?RequestClass $class = null;
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Request::class;
@@ -31,8 +33,6 @@ class RequestResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $cluster = Requests::class;
-
-    protected static ?RequestClass $class = null;
 
     public static function table(Table $table): Table
     {

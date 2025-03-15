@@ -13,24 +13,26 @@ use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries;
+use App\Filament\Panels\User\Resources\OrganizationResource\Pages\NewInquiry;
 use App\Filament\Resources\RequestResource;
 use Filament\Facades\Filament;
 use Filament\Tables\Actions\ActionGroup;
 
 class InquiryResource extends RequestResource
 {
+    public static ?RequestClass $class = RequestClass::INQUIRY;
+
     protected static bool $shouldRegisterNavigation = true;
 
     protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
 
     protected static ?string $label = 'Inquiries';
 
-    protected static ?RequestClass $class = RequestClass::INQUIRY;
-
     public static function getPages(): array
     {
         return [
             'index' => ListInquiries::route('/'),
+            'new' => NewInquiry::route('new/{record}'),
         ];
     }
 
