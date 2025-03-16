@@ -20,13 +20,13 @@ use Illuminate\Support\Facades\Auth;
 
 class SuggestionResource extends RequestResource
 {
+    public static ?RequestClass $class = RequestClass::SUGGESTION;
+
     protected static bool $shouldRegisterNavigation = true;
 
     protected static ?string $navigationIcon = 'heroicon-o-light-bulb';
 
     protected static ?string $label = 'Suggestions';
-
-    protected static ?RequestClass $class = RequestClass::SUGGESTION;
 
     public static function getPages(): array
     {

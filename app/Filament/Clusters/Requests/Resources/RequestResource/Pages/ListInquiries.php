@@ -3,6 +3,7 @@
 namespace App\Filament\Clusters\Requests\Resources\RequestResource\Pages;
 
 use App\Enums\ActionStatus;
+use App\Filament\Actions\NewRequestPromptAction;
 use App\Filament\Clusters\Requests\Resources\InquiryResource;
 use Filament\Facades\Filament;
 use Filament\Resources\Components\Tab;
@@ -12,6 +13,14 @@ use Illuminate\Database\Eloquent\Builder;
 class ListInquiries extends ListRecords
 {
     protected static string $resource = InquiryResource::class;
+
+    public function getHeaderActions(): array
+    {
+        return [
+            NewRequestPromptAction::make()
+                ->class(static::getResource()::$class),
+        ];
+    }
 
     public function getTabs(): array
     {

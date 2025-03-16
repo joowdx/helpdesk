@@ -4,7 +4,8 @@ namespace App\Filament\Panels\Moderator\Clusters\Requests\Resources;
 
 use App\Filament\Clusters\Requests\Resources\InquiryResource as Resource;
 use App\Filament\Panels\Moderator\Clusters\Requests;
-use App\Filament\Panels\Moderator\Clusters\Requests\Pages\Inquiries;
+use App\Filament\Panels\Moderator\Clusters\Requests\Pages\ListInquiries;
+use App\Filament\Panels\Moderator\Clusters\Requests\Pages\NewInquiry;
 
 class InquiryResource extends Resource
 {
@@ -13,7 +14,8 @@ class InquiryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Inquiries::route('/'),
+            'index' => ListInquiries::route('/'),
+            'new' => NewInquiry::route('new/{record}'),
         ];
     }
 }

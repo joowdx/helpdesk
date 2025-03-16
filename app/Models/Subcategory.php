@@ -31,7 +31,7 @@ class Subcategory extends Model
 
         static::addGlobalScope('subcategory_order', function (Builder $query) {
             $query->orderByRaw("CASE WHEN subcategories.name like 'others' THEN 1 ELSE 0 END")
-                ->orderBy('name');
+                ->orderBy('subcategories.name');
         });
     }
 

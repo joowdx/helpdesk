@@ -17,7 +17,6 @@ use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Filters\OrganizationFilter;
 use App\Filament\Panels\User\Resources\RequestResource\Pages;
 use App\Models\Request;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;

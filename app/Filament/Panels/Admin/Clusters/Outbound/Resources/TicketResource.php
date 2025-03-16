@@ -4,7 +4,7 @@ namespace App\Filament\Panels\Admin\Clusters\Outbound\Resources;
 
 use App\Filament\Clusters\Requests\Resources\TicketResource as Resource;
 use App\Filament\Panels\Admin\Clusters\Outbound;
-use App\Filament\Panels\Admin\Clusters\Outbound\Resources\RequestResource\Pages\Tickets;
+use App\Filament\Panels\Admin\Clusters\Outbound\Resources\RequestResource\Pages\ListTickets;
 
 class TicketResource extends Resource
 {
@@ -15,7 +15,7 @@ class TicketResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Tickets::route('/'),
+            'index' => ListTickets::route('/'),
         ];
     }
 }

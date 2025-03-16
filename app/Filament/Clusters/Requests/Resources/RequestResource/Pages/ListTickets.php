@@ -3,6 +3,7 @@
 namespace App\Filament\Clusters\Requests\Resources\RequestResource\Pages;
 
 use App\Enums\ActionStatus;
+use App\Filament\Actions\NewRequestPromptAction;
 use App\Filament\Clusters\Requests\Resources\TicketResource;
 use Filament\Facades\Filament;
 use Filament\Resources\Components\Tab;
@@ -13,6 +14,14 @@ use Illuminate\Support\Facades\Auth;
 class ListTickets extends ListRecords
 {
     protected static string $resource = TicketResource::class;
+
+    public function getHeaderActions(): array
+    {
+        return [
+            NewRequestPromptAction::make()
+                ->class(static::getResource()::$class),
+        ];
+    }
 
     public function getTabs(): array
     {

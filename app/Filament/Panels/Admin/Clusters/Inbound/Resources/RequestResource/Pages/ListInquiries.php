@@ -2,10 +2,10 @@
 
 namespace App\Filament\Panels\Admin\Clusters\Inbound\Resources\RequestResource\Pages;
 
-use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries;
+use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries as Index;
 use App\Filament\Panels\Admin\Clusters\Inbound\Resources\InquiryResource;
 
-class Inquiries extends ListInquiries
+class ListInquiries extends Index
 {
     protected static string $resource = InquiryResource::class;
 }

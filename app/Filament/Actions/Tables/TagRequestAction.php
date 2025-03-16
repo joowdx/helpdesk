@@ -76,8 +76,7 @@ class TagRequestAction extends Action
             $request->tags()->sync($data['labels']);
         });
 
-        $this->disabled(fn (Request $request) =>
-            $request->action->status->finalized() &&
+        $this->disabled(fn (Request $request) => $request->action->status->finalized() &&
             $request->action->created_at->addDays(90)->lessThan(now())
         );
     }

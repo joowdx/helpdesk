@@ -16,9 +16,9 @@ class RequestsMadeWidget extends BaseWidget
 
         return [
             Stat::make('Requests', Request::where('user_id', $id)->count()),
-            Stat::make('Inquiries', Request::where('user_id', $id)->where('class', RequestClass::INQUIRY)->count()),
-            Stat::make('Suggestions', Request::where('user_id', $id)->where('class', RequestClass::SUGGESTION)->count()),
-            Stat::make('Tickets', Request::where('user_id', $id)->where('class', RequestClass::TICKET)->count()),
+            Stat::make('ListInquiries', Request::where('user_id', $id)->where('class', RequestClass::INQUIRY)->count()),
+            Stat::make('ListSuggestions', Request::where('user_id', $id)->where('class', RequestClass::SUGGESTION)->count()),
+            Stat::make('ListTickets', Request::where('user_id', $id)->where('class', RequestClass::TICKET)->count()),
         ];
     }
 }

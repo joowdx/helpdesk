@@ -19,13 +19,13 @@ use Filament\Tables\Actions\ActionGroup;
 
 class InquiryResource extends RequestResource
 {
+    public static ?RequestClass $class = RequestClass::INQUIRY;
+
     protected static bool $shouldRegisterNavigation = true;
 
     protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
 
     protected static ?string $label = 'Inquiries';
-
-    protected static ?RequestClass $class = RequestClass::INQUIRY;
 
     public static function getPages(): array
     {

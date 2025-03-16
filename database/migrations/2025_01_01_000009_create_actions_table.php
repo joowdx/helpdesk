@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\ActionStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -23,7 +22,7 @@ return new class extends Migration
             $table->boolean('check')->virtualAs("(`status` = 'closed' OR `resolution` = '') AND ((`system` = 1 AND `user_id` IS NULL) OR (`system` = 0))");
             $table->timestamps();
 
-            $table->check("`check` = 1", 'actions_check');
+            $table->check('`check` = 1', 'actions_check');
         });
     }
 

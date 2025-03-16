@@ -4,7 +4,7 @@ namespace App\Filament\Panels\Admin\Clusters\Inbound\Resources;
 
 use App\Filament\Clusters\Requests\Resources\SuggestionResource as Resource;
 use App\Filament\Panels\Admin\Clusters\Inbound;
-use App\Filament\Panels\Admin\Clusters\Inbound\Resources\RequestResource\Pages\Suggestions;
+use App\Filament\Panels\Admin\Clusters\Inbound\Resources\RequestResource\Pages\ListSuggestions;
 
 class SuggestionResource extends Resource
 {
@@ -13,7 +13,7 @@ class SuggestionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Suggestions::route('/'),
+            'index' => ListSuggestions::route('/'),
         ];
     }
 }

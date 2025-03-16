@@ -4,7 +4,8 @@ namespace App\Filament\Panels\Moderator\Clusters\Requests\Resources;
 
 use App\Filament\Clusters\Requests\Resources\TicketResource as Resource;
 use App\Filament\Panels\Moderator\Clusters\Requests;
-use App\Filament\Panels\Moderator\Clusters\Requests\Pages\Tickets;
+use App\Filament\Panels\Moderator\Clusters\Requests\Pages\ListTickets;
+use App\Filament\Panels\Moderator\Clusters\Requests\Pages\NewTicket;
 
 class TicketResource extends Resource
 {
@@ -13,7 +14,8 @@ class TicketResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Tickets::route('/'),
+            'index' => ListTickets::route('/'),
+            'new' => NewTicket::route('new/{record}'),
         ];
     }
 }

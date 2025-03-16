@@ -24,6 +24,8 @@ use Filament\Tables\Actions\ActionGroup;
 
 class TicketResource extends RequestResource
 {
+    public static ?RequestClass $class = RequestClass::TICKET;
+
     protected static bool $shouldRegisterNavigation = true;
 
     protected static ?int $navigationSort = -2;
@@ -31,8 +33,6 @@ class TicketResource extends RequestResource
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
 
     protected static ?string $label = 'Tickets';
-
-    protected static ?RequestClass $class = RequestClass::TICKET;
 
     public static function getPages(): array
     {

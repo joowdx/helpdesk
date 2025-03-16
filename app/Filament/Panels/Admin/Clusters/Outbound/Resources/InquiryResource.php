@@ -4,7 +4,7 @@ namespace App\Filament\Panels\Admin\Clusters\Outbound\Resources;
 
 use App\Filament\Clusters\Requests\Resources\InquiryResource as Resource;
 use App\Filament\Panels\Admin\Clusters\Outbound;
-use App\Filament\Panels\Admin\Clusters\Outbound\Resources\RequestResource\Pages\Inquiries;
+use App\Filament\Panels\Admin\Clusters\Outbound\Resources\RequestResource\Pages\ListInquiries;
 
 class InquiryResource extends Resource
 {
@@ -15,7 +15,7 @@ class InquiryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Inquiries::route('/'),
+            'index' => ListInquiries::route('/'),
         ];
     }
 }

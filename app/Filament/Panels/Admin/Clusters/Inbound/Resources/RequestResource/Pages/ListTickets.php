@@ -2,10 +2,10 @@
 
 namespace App\Filament\Panels\Admin\Clusters\Inbound\Resources\RequestResource\Pages;
 
-use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListTickets;
+use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListTickets as Index;
 use App\Filament\Panels\Admin\Clusters\Inbound\Resources\TicketResource;
 
-class Tickets extends ListTickets
+class ListTickets extends Index
 {
     protected static string $resource = TicketResource::class;
 }
