@@ -8,7 +8,7 @@ use App\Filament\Panels\Admin\Clusters\Outbound\Resources\RequestResource\Pages\
 
 class SuggestionResource extends Resource
 {
-    public static bool $inbound = false;
+    public static ?bool $inbound = false;
 
     protected static ?string $cluster = Outbound::class;
 

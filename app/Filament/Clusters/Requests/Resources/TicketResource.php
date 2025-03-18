@@ -43,50 +43,52 @@ class TicketResource extends RequestResource
 
     public static function tableActions(): array
     {
-        $moderator = [
-            StartRequestAction::make(),
-            CompleteRequestAction::make(),
-            QueueRequestAction::make(),
-            UndoRecentAction::make(),
-            ShowRequestAction::make(),
-            ViewRequestHistoryAction::make(),
-            ActionGroup::make([
-                TagRequestAction::make(),
-                SuspendRequestAction::make(),
-                AssignRequestAction::make(),
-                RequeueRequestAction::make(),
-                RejectRequestAction::make(),
-                RecategorizeRequestAction::make(),
-                ReclassifyRequestAction::make(),
-                CloseRequestAction::make()
-                    ->requireRemarks(false),
-            ]),
-        ];
+        $panel = Filament::getCurrentPanel()->getId();
 
-        return match (Filament::getCurrentPanel()->getId()) {
-            'admin' => static::$inbound ? $moderator : [
+        return match (static::$inbound) {
+            true => match ($panel) {
+                'admin', 'moderator' => [
+                    StartRequestAction::make(),
+                    CompleteRequestAction::make(),
+                    QueueRequestAction::make(),
+                    UndoRecentAction::make(),
+                    ShowRequestAction::make(),
+                    ViewRequestHistoryAction::make(),
+                    ActionGroup::make([
+                        TagRequestAction::make(),
+                        SuspendRequestAction::make(),
+                        AssignRequestAction::make(),
+                        RequeueRequestAction::make(),
+                        RejectRequestAction::make(),
+                        RecategorizeRequestAction::make(),
+                        ReclassifyRequestAction::make(),
+                        CloseRequestAction::make()
+                            ->requireRemarks(false),
+                    ]),
+                ],
+                'agent' => [
+                    StartRequestAction::make(),
+                    CompleteRequestAction::make(),
+                    UndoRecentAction::make(),
+                    ShowRequestAction::make(),
+                    ViewRequestHistoryAction::make(),
+                    ActionGroup::make([
+                        TagRequestAction::make(),
+                        SuspendRequestAction::make(),
+                        RequeueRequestAction::make(),
+                        RejectRequestAction::make(),
+                        RecategorizeRequestAction::make(),
+                        ReclassifyRequestAction::make(),
+                        CloseRequestAction::make()
+                            ->allowResolved(false),
+                    ]),
+                ],
+                default => parent::tableActions(),
+            },
+            default => [
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
             ],
-            'moderator' => $moderator,
-            'agent' => [
-                StartRequestAction::make(),
-                CompleteRequestAction::make(),
-                UndoRecentAction::make(),
-                ShowRequestAction::make(),
-                ViewRequestHistoryAction::make(),
-                ActionGroup::make([
-                    TagRequestAction::make(),
-                    SuspendRequestAction::make(),
-                    RequeueRequestAction::make(),
-                    RejectRequestAction::make(),
-                    RecategorizeRequestAction::make(),
-                    ReclassifyRequestAction::make(),
-                    CloseRequestAction::make()
-                        ->allowResolved(false),
-                ]),
-            ],
-            default => parent::tableActions(),
         };
     }
 }

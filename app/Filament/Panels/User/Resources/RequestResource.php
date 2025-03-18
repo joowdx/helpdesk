@@ -17,6 +17,7 @@ use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Filters\OrganizationFilter;
 use App\Filament\Panels\User\Resources\RequestResource\Pages;
 use App\Models\Request;
+use Filament\Pages\SimplePage;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
@@ -24,7 +25,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class RequestResource extends Resource
+class RequestResource extends SimplePage
 {
     protected static ?string $model = Request::class;
 

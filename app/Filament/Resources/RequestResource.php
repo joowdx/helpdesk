@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RequestResource extends Resource
 {
-    public static bool $inbound = true;
+    public static ?bool $inbound = true;
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -112,12 +112,21 @@ class RequestResource extends Resource
             ->when(static::$class, fn ($query, $class) => $query->where('class', $class))
             ->when($panel !== 'root', fn ($query) => $query->whereHas('action', fn ($query) => $query->where('status', '!=', ActionStatus::RETRACTED)));
 
-        return match ($panel) {
-            'root' => $query,
-            'admin' => $query->where(static::$inbound ? 'organization_id' : 'from_id', Auth::user()->organization_id),
-            'moderator' => $query->where('organization_id', Auth::user()->organization_id),
-            'agent' => $query->whereHas('assignees', fn ($query) => $query->where('assigned_id', Auth::id())),
-            default => $query->whereRaw('1 = 0'),
+        return match (static::$inbound) {
+            true => match ($panel) {
+                'root' => $query,
+                'admin' => $query->where('from_id', Auth::user()->organization_id),
+                'moderator' => $query->where('organization_id', Auth::user()->organization_id),
+                'agent' => $query->whereHas('assignees', fn ($query) => $query->where('assigned_id', Auth::id())),
+                default => $query->whereRaw('1 = 0'),
+            },
+            false => match ($panel) {
+                'root' => $query,
+                'admin','moderator' => $query->where('from_id', Auth::user()->organization_id),
+                // 'agent', 'user' => $query->where('user_id', Auth::id()),
+                default => $query->whereRaw('1 = 0'),
+            },
+            default => $query->where('user_id', Auth::id()),
         };
     }
 

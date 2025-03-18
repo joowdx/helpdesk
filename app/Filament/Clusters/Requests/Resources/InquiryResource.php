@@ -6,16 +6,21 @@ use App\Enums\RequestClass;
 use App\Filament\Actions\Tables\AssignRequestAction;
 use App\Filament\Actions\Tables\CloseRequestAction;
 use App\Filament\Actions\Tables\CompleteRequestAction;
+use App\Filament\Actions\Tables\DeleteRequestAction;
 use App\Filament\Actions\Tables\RecategorizeRequestAction;
 use App\Filament\Actions\Tables\ReclassifyRequestAction;
+use App\Filament\Actions\Tables\ReopenRequestAction;
 use App\Filament\Actions\Tables\RespondRequestAction;
+use App\Filament\Actions\Tables\RetractRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
+use App\Filament\Actions\Tables\UpdateRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries;
 use App\Filament\Resources\RequestResource;
 use Filament\Facades\Filament;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\ForceDeleteAction;
 
 class InquiryResource extends RequestResource
 {
@@ -69,6 +74,20 @@ class InquiryResource extends RequestResource
                     CloseRequestAction::make()
                         ->allowResolved(false)
                         ->requireRemarks(false),
+                ]),
+            ],
+            'user' => [
+                RespondRequestAction::make(),
+                ShowRequestAction::make(),
+                ViewRequestHistoryAction::make(),
+                ActionGroup::make([
+                    ReopenRequestAction::make(),
+                    UpdateRequestAction::make(),
+                    RetractRequestAction::make()
+                        ->label('Retract'),
+                    DeleteRequestAction::make(),
+                    ForceDeleteAction::make()
+                        ->label('Delete'),
                 ]),
             ],
             default => parent::tableActions(),
