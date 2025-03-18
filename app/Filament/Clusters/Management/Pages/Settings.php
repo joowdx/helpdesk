@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Panels\Admin\Clusters\Organization\Pages;
+namespace App\Filament\Clusters\Management\Pages;
 
-use App\Filament\Panels\Admin\Clusters\Organization as Cluster;
+use App\Filament\Clusters\Management;
 use App\Models\Organization;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -25,10 +26,17 @@ class Settings extends Page
 
     protected static string $view = 'filament.panels.admin.clusters.organization.pages.settings';
 
-    protected static ?string $cluster = Cluster::class;
+    protected static ?string $cluster = Management::class;
+
+    public static function canAccess(): bool
+    {
+        return Filament::getCurrentPanel()->getId() !== 'root';
+    }
 
     public function mount(): void
     {
+        abort_unless(static::canAccess(), 403);
+
         $this->fillForm();
     }
 

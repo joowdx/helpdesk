@@ -28,6 +28,11 @@ class TagResource extends Resource
 
     protected static ?string $cluster = Management::class;
 
+    public static function canAccess(): bool
+    {
+        return in_array(Filament::getCurrentPanel()->getId(), ['root', 'admin']);
+    }
+
     public static function form(Form $form): Form
     {
         $panel = Filament::getCurrentPanel()->getId();

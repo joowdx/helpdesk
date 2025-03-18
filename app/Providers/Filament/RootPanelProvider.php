@@ -33,10 +33,9 @@ class RootPanelProvider extends PanelProvider
             ->brandLogo(fn () => view('banner'))
             ->font('Urbanist')
             ->colors([...Color::all(), 'gray' => Color::Neutral])
-            ->discoverResources(in: app_path('Filament/Panels/Root/Resources'), for: 'App\\Filament\\Panels\\Root\\Resources')
             ->discoverPages(in: app_path('Filament/Panels/Root/Pages'), for: 'App\\Filament\\Panels\\Root\\Pages')
             ->discoverWidgets(in: app_path('Filament/Panels/Root/Widgets'), for: 'App\\Filament\\Panels\\Root\\Widgets')
-            ->discoverClusters(in: app_path('Filament/Panels/Root/Clusters'), for: 'App\\Filament\\Panels\\Root\\Clusters')
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->pages([Pages\Dashboard::class])
             ->widgets([
                 Widgets\AccountWidget::class,

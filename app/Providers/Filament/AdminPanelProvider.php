@@ -34,10 +34,9 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(fn () => view('banner'))
             ->font('Urbanist')
             ->colors([...Color::all(), 'gray' => Color::Neutral])
-            ->discoverResources(in: app_path('Filament/Panels/Admin/Resources'), for: 'App\\Filament\\Panels\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Panels/Admin/Pages'), for: 'App\\Filament\\Panels\\Admin\\Pages')
             ->discoverWidgets(in: app_path('Filament/Panels/Admin/Widgets'), for: 'App\\Filament\\Panels\\Admin\\Widgets')
-            ->discoverClusters(in: app_path('Filament/Panels/Admin/Clusters'), for: 'App\\Filament\\Panels\\Admin\\Clusters')
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->pages([Pages\Dashboard::class])
             ->widgets([
                 Widgets\AccountWidget::class,

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Panels\Root\Clusters\Management\Resources;
+namespace App\Filament\Clusters\Management\Resources;
 
-use App\Filament\Panels\Root\Clusters\Management;
-use App\Filament\Panels\Root\Clusters\Management\Resources\OrganizationResource\Pages;
+use App\Filament\Clusters\Management;
+use App\Filament\Clusters\Management\Resources\OrganizationResource\Pages;
 use App\Models\Organization;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -24,6 +25,11 @@ class OrganizationResource extends Resource
     protected static ?string $cluster = Management::class;
 
     protected static ?string $recordTitleAttribute = 'code';
+
+    public static function canAccess(): bool
+    {
+        return Filament::getCurrentPanel()->getId() === 'root';
+    }
 
     public static function form(Form $form): Form
     {

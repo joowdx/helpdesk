@@ -35,6 +35,11 @@ class UserResource extends Resource
 
     protected static ?string $modelLabel = 'Account';
 
+    public static function canAccess(): bool
+    {
+        return in_array(Filament::getCurrentPanel()->getId(), ['root', 'admin']);
+    }
+
     public static function form(Form $form): Form
     {
         return $form

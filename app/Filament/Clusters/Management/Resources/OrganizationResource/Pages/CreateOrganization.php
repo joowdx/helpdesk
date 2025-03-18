@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Panels\Root\Clusters\Management\Resources\OrganizationResource\Pages;
+namespace App\Filament\Clusters\Management\Resources\OrganizationResource\Pages;
 
-use App\Filament\Panels\Root\Clusters\Management\Resources\OrganizationResource;
+use App\Filament\Clusters\Management\Resources\OrganizationResource;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 
