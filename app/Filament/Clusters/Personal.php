@@ -3,10 +3,16 @@
 namespace App\Filament\Clusters;
 
 use Filament\Clusters\Cluster;
+use Filament\Facades\Filament;
 
 class Personal extends Cluster
 {
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationIcon = 'gmdi-support-agent-o';
+
+    public static function getNavigationLabel(): string
+    {
+        return Filament::getCurrentPanel()->getId() === 'user' ? 'Requests' : parent::getNavigationLabel();
+    }
 }

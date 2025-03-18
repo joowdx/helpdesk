@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Clusters\Requests\Resources\RequestResource\Pages;
+namespace App\Filament\Clusters\Personal\Resources\RequestResource\Pages;
 
 use App\Enums\RequestClass;
-use App\Filament\Clusters\Requests\Resources\SuggestionResource;
+use App\Filament\Clusters\Personal\Resources\SuggestionResource;
 use App\Filament\Concerns\NewRequest;
 use Filament\Resources\Pages\EditRecord;
 

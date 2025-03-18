@@ -34,10 +34,9 @@ class ModeratorPanelProvider extends PanelProvider
             ->brandLogo(fn () => view('banner'))
             ->font('Urbanist')
             ->colors([...Color::all(), 'gray' => Color::Neutral])
-            ->discoverResources(in: app_path('Filament/Panels/Moderator/Resources'), for: 'App\\Filament\\Panels\\Moderator\\Resources')
             ->discoverPages(in: app_path('Filament/Panels/Moderator/Pages'), for: 'App\\Filament\\Panels\\Moderator\\Pages')
             ->discoverWidgets(in: app_path('Filament/Panels/Moderator/Widgets'), for: 'App\\Filament\\Panels\\Moderator\\Widgets')
-            ->discoverClusters(in: app_path('Filament/Panels/Moderator/Clusters'), for: 'App\\Filament\\Panels\\Moderator\\Clusters')
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->pages([Pages\Dashboard::class])
             ->widgets([
                 Widgets\AccountWidget::class,

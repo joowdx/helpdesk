@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Clusters\Requests\Resources\RequestResource\Pages;
+namespace App\Filament\Clusters\Outbound\Resources\RequestResource\Pages;
 
 use App\Filament\Actions\NewRequestPromptAction;
-use App\Filament\Clusters\Requests\Resources\InquiryResource;
+use App\Filament\Clusters\Outbound\Resources\InquiryResource;
 use App\Filament\Concerns\HasInquiryTabs;
 use Filament\Resources\Pages\ListRecords;
 

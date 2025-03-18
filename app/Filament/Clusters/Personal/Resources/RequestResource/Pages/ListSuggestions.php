@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Clusters\Requests\Resources\RequestResource\Pages;
+namespace App\Filament\Clusters\Personal\Resources\RequestResource\Pages;
 
 use App\Filament\Actions\NewRequestPromptAction;
-use App\Filament\Clusters\Requests\Resources\SuggestionResource;
+use App\Filament\Clusters\Personal\Resources\SuggestionResource;
 use App\Filament\Concerns\HasSuggestionTabs;
 use Filament\Resources\Pages\ListRecords;
 

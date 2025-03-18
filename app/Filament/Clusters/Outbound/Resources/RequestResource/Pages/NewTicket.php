@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Filament\Clusters\Requests\Resources\RequestResource\Pages;
+namespace App\Filament\Clusters\Outbound\Resources\RequestResource\Pages;
 
 use App\Enums\RequestClass;
-use App\Filament\Clusters\Requests\Resources\InquiryResource;
+use App\Filament\Clusters\Outbound\Resources\TicketResource;
 use App\Filament\Concerns\NewRequest;
 use Filament\Resources\Pages\EditRecord;
 
-class NewInquiry extends EditRecord
+class NewTicket extends EditRecord
 {
     use NewRequest;
 
-    public static RequestClass $classification = RequestClass::INQUIRY;
+    public static RequestClass $classification = RequestClass::TICKET;
 
-    protected static string $resource = InquiryResource::class;
+    protected static string $resource = TicketResource::class;
 
-    protected static ?string $breadcrumb = 'New Inquiry';
+    protected static ?string $breadcrumb = 'New Ticket';
 
     public function getSubNavigation(): array
     {

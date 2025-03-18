@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Clusters\Requests\Resources;
+namespace App\Filament\Clusters\Outbound\Resources;
 
 use App\Enums\RequestClass;
 use App\Filament\Actions\Tables\AssignRequestAction;
@@ -12,14 +12,19 @@ use App\Filament\Actions\Tables\RespondRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
-use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries;
-use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\NewInquiry;
+use App\Filament\Clusters\Outbound;
+use App\Filament\Clusters\Outbound\Resources\RequestResource\Pages\ListInquiries;
+use App\Filament\Clusters\Outbound\Resources\RequestResource\Pages\NewInquiry;
 use App\Filament\Resources\RequestResource;
 use Filament\Facades\Filament;
 use Filament\Tables\Actions\ActionGroup;
 
 class InquiryResource extends RequestResource
 {
+    public static ?bool $inbound = false;
+
+    protected static ?string $cluster = Outbound::class;
+
     public static ?RequestClass $class = RequestClass::INQUIRY;
 
     protected static bool $shouldRegisterNavigation = true;

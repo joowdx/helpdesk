@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Clusters\Requests\Resources;
+namespace App\Filament\Clusters\Outbound\Resources;
 
 use App\Enums\RequestClass;
 use App\Enums\UserRole;
@@ -13,14 +13,19 @@ use App\Filament\Actions\Tables\RestoreRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
-use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListSuggestions;
-use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\NewSuggestion;
+use App\Filament\Clusters\Outbound;
+use App\Filament\Clusters\Outbound\Resources\RequestResource\Pages\ListSuggestions;
+use App\Filament\Clusters\Outbound\Resources\RequestResource\Pages\NewSuggestion;
 use App\Filament\Resources\RequestResource;
 use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Support\Facades\Auth;
 
 class SuggestionResource extends RequestResource
 {
+    public static ?bool $inbound = false;
+
+    protected static ?string $cluster = Outbound::class;
+
     public static ?RequestClass $class = RequestClass::SUGGESTION;
 
     protected static bool $shouldRegisterNavigation = true;

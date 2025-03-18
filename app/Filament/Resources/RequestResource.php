@@ -13,16 +13,19 @@ use App\Filament\Clusters\Requests;
 use App\Filament\Filters\OrganizationFilter;
 use App\Filament\Filters\TagFilter;
 use App\Models\Request;
+use Filament\Actions\ActionGroup;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-class RequestResource extends Resource
+abstract class RequestResource extends Resource
 {
-    public static bool $inbound = true;
+    public static ?bool $inbound = true;
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -41,7 +44,8 @@ class RequestResource extends Resource
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->with(['user', 'organization', 'action', 'actions', 'tags', 'category', 'subcategory']))
             ->columns([
-                Tables\Columns\TextColumn::make('action.status')
+                TextColumn::make('action.status')
+                    ->searchable(['code'])
                     ->label('Status')
                     ->badge()
                     ->description(fn (Request $request) => "#{$request->code}")
@@ -54,34 +58,34 @@ class RequestResource extends Resource
                             default => $request->action?->status,
                         };
                     }),
-                Tables\Columns\TextColumn::make('subject')
+                TextColumn::make('subject')
                     ->sortable()
                     ->searchable()
                     ->limit(24)
                     ->wrap()
                     ->tooltip(fn ($column) => strlen($column->getState()) > $column->getCharacterLimit() ? $column->getState() : null),
-                Tables\Columns\TextColumn::make('user.name')
+                TextColumn::make('user.name')
                     ->description(fn (Request $request) => $request->from->code),
-                Tables\Columns\TextColumn::make('organization.code')
+                TextColumn::make('organization.code')
                     ->sortable()
                     ->searchable()
                     ->limit(36)
                     ->extraCellAttributes(['class' => 'font-mono'])
                     ->tooltip(fn (Request $request) => $request->organization->name)
                     ->hidden(! in_array($panel, ['root'])),
-                Tables\Columns\TextColumn::make('category.name')
+                TextColumn::make('category.name')
                     ->description(fn (Request $request) => $request->subcategory->name),
-                Tables\Columns\TextColumn::make('class')
+                TextColumn::make('class')
                     ->badge()
                     ->alignEnd()
                     ->visible(static::class === self::class),
-                Tables\Columns\TextColumn::make('tags.name')
+                TextColumn::make('tags.name')
                     ->badge()
                     ->wrap()
                     ->alignEnd()
                     ->toggleable()
                     ->color(fn (Request $request, string $state) => $request->tags->first(fn ($tag) => $tag->name === $state)?->color ?? 'gray'),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable()
@@ -112,12 +116,20 @@ class RequestResource extends Resource
             ->when(static::$class, fn ($query, $class) => $query->where('class', $class))
             ->when($panel !== 'root', fn ($query) => $query->whereHas('action', fn ($query) => $query->where('status', '!=', ActionStatus::RETRACTED)));
 
-        return match ($panel) {
-            'root' => $query,
-            'admin' => $query->where(static::$inbound ? 'organization_id' : 'from_id', Auth::user()->organization_id),
-            'moderator' => $query->where('organization_id', Auth::user()->organization_id),
-            'agent' => $query->whereHas('assignees', fn ($query) => $query->where('assigned_id', Auth::id())),
-            default => $query->whereRaw('1 = 0'),
+        return match (static::$inbound) {
+            true => match ($panel) {
+                'root' => $query,
+                'admin' => $query->where('from_id', Auth::user()->organization_id),
+                'moderator' => $query->where('organization_id', Auth::user()->organization_id),
+                'agent' => $query->whereHas('assignees', fn ($query) => $query->where('assigned_id', Auth::id())),
+                default => $query->whereRaw('1 = 0'),
+            },
+            false => match ($panel) {
+                'root' => $query,
+                'admin','moderator' => $query->where('from_id', Auth::user()->organization_id),
+                default => $query->whereRaw('1 = 0'),
+            },
+            default => $query->where('user_id', Auth::id()),
         };
     }
 
@@ -125,7 +137,7 @@ class RequestResource extends Resource
     {
         if (static::class === self::class) {
             return [
-                Tables\Filters\SelectFilter::make('class')
+                SelectFilter::make('class')
                     ->options(RequestClass::class),
             ];
         }
@@ -135,7 +147,7 @@ class RequestResource extends Resource
                 TagFilter::make(),
                 OrganizationFilter::make()
                     ->withUnaffiliated(false),
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ],
             default => [
                 TagFilter::make(),
@@ -148,7 +160,7 @@ class RequestResource extends Resource
         return [
             ShowRequestAction::make(),
             ViewRequestHistoryAction::make(),
-            Tables\Actions\ActionGroup::make([
+            ActionGroup::make([
                 TagRequestAction::make(),
                 RecategorizeRequestAction::make(),
                 ReclassifyRequestAction::make(),
