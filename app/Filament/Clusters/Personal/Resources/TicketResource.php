@@ -19,7 +19,7 @@ use App\Filament\Actions\Tables\UndoRecentAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Personal;
 use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\ListTickets;
-use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\NewInquiry;
+use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\NewTicket;
 use App\Filament\Resources\RequestResource;
 use Filament\Facades\Filament;
 use Filament\Tables\Actions\ActionGroup;
@@ -44,7 +44,7 @@ class TicketResource extends RequestResource
     {
         return [
             'index' => ListTickets::route('/'),
-            'new' => NewInquiry::route('new/{record}'),
+            'new' => NewTicket::route('new/{record}'),
         ];
     }
 
