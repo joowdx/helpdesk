@@ -3,20 +3,18 @@
 namespace App\Filament\Clusters\Personal\Resources;
 
 use App\Enums\RequestClass;
-use App\Filament\Actions\Tables\AssignRequestAction;
-use App\Filament\Actions\Tables\CloseRequestAction;
-use App\Filament\Actions\Tables\CompleteRequestAction;
-use App\Filament\Actions\Tables\RecategorizeRequestAction;
-use App\Filament\Actions\Tables\ReclassifyRequestAction;
+use App\Filament\Actions\Tables\CancelRequestAction;
+use App\Filament\Actions\Tables\RecallRequestAction;
+use App\Filament\Actions\Tables\ReopenRequestAction;
 use App\Filament\Actions\Tables\RespondRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
-use App\Filament\Actions\Tables\TagRequestAction;
+use App\Filament\Actions\Tables\UndoRecentAction;
+use App\Filament\Actions\Tables\UpdateRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
-use App\Filament\Clusters\Outbound\Resources\RequestResource\Pages\NewInquiry;
 use App\Filament\Clusters\Personal;
 use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\ListInquiries;
+use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\NewInquiry;
 use App\Filament\Resources\RequestResource;
-use Filament\Facades\Filament;
 use Filament\Tables\Actions\ActionGroup;
 
 class InquiryResource extends RequestResource
@@ -43,42 +41,17 @@ class InquiryResource extends RequestResource
 
     public static function tableActions(): array
     {
-        $moderator = [
-            CompleteRequestAction::make(),
+        return [
             RespondRequestAction::make(),
-            AssignRequestAction::make(),
             ShowRequestAction::make(),
             ViewRequestHistoryAction::make(),
             ActionGroup::make([
-                TagRequestAction::make(),
-                RecategorizeRequestAction::make(),
-                ReclassifyRequestAction::make(),
-                CloseRequestAction::make()
-                    ->requireRemarks(false),
+                UndoRecentAction::make(),
+                ReopenRequestAction::make(),
+                UpdateRequestAction::make(),
+                RecallRequestAction::make(),
+                CancelRequestAction::make(),
             ]),
         ];
-
-        return match (Filament::getCurrentPanel()->getId()) {
-            'admin' => static::$inbound ? $moderator : [
-                ShowRequestAction::make(),
-                ViewRequestHistoryAction::make(),
-            ],
-            'moderator' => $moderator,
-            'agent' => [
-                CompleteRequestAction::make(),
-                RespondRequestAction::make(),
-                ShowRequestAction::make(),
-                ViewRequestHistoryAction::make(),
-                ActionGroup::make([
-                    TagRequestAction::make(),
-                    RecategorizeRequestAction::make(),
-                    ReclassifyRequestAction::make(),
-                    CloseRequestAction::make()
-                        ->allowResolved(false)
-                        ->requireRemarks(false),
-                ]),
-            ],
-            default => parent::tableActions(),
-        };
     }
 }

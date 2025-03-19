@@ -4,6 +4,7 @@ namespace App\Filament\Actions\Tables;
 
 use App\Enums\ActionResolution;
 use App\Enums\ActionStatus;
+use App\Enums\RequestClass;
 use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
 use App\Filament\Forms\FileAttachment;
 use App\Models\Request;
@@ -84,9 +85,17 @@ class CancelRequestAction extends Action
             }
         });
 
-        $this->disabled(fn (Request $request) => in_array($request->action->status, [
-            ActionStatus::COMPLETED,
-            ActionStatus::CLOSED,
-        ]));
+        $this->disabled(function (Request $request) {
+            return match ($request->class) {
+                RequestClass::TICKET => in_array($request->action->status, [
+                    ActionStatus::COMPLETED,
+                    ActionStatus::CLOSED,
+                ]),
+                RequestClass::INQUIRY => in_array($request->action->status, [
+                    ActionStatus::SUBMITTED,
+                    ActionStatus::CLOSED,
+                ]),
+            };
+        });
     }
 }

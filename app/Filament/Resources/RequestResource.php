@@ -9,7 +9,6 @@ use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
-use App\Filament\Clusters\Personal;
 use App\Filament\Clusters\Requests;
 use App\Filament\Filters\OrganizationFilter;
 use App\Filament\Filters\TagFilter;
@@ -23,7 +22,6 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Component;
 
 abstract class RequestResource extends Resource
 {
