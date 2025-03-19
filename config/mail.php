@@ -61,6 +61,14 @@ return [
             // ],
         ],
 
+        'mailersend' => [
+            'transport' => 'mailersend',
+        ],
+
+        'mailgun' => [
+            'transport' => 'mailgun',
+        ],
+
         'resend' => [
             'transport' => 'resend',
         ],
@@ -82,6 +90,7 @@ return [
         'failover' => [
             'transport' => 'failover',
             'mailers' => [
+                'roundrobin',
                 'smtp',
                 'log',
             ],
@@ -90,8 +99,9 @@ return [
         'roundrobin' => [
             'transport' => 'roundrobin',
             'mailers' => [
-                'ses',
-                'postmark',
+                'mailersend',
+                'mailgun',
+                'resend',
             ],
         ],
 
@@ -109,8 +119,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'no-reply@helpdesk.com'),
+        'name' => env('MAIL_FROM_NAME', 'Do-Not-Reply'),
     ],
 
 ];
