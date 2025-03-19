@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions\Tables;
 
+use App\Enums\ActionResolution;
 use App\Enums\ActionStatus;
 use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
 use App\Filament\Forms\FileAttachment;
@@ -12,38 +13,42 @@ use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
-class ReopenRequestAction extends Action
+class ResolveRequestAction extends Action
 {
     use CanNotifyUsers;
 
-    protected static ?ActionStatus $requestAction = ActionStatus::REOPENED;
+    protected static ?ActionStatus $requestAction = ActionStatus::CLOSED;
+
+    protected static ?ActionResolution $requestResolution = ActionResolution::RESOLVED;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->name('reopen-request');
+        $this->name('resolve-request');
 
-        $this->label('Reopen');
+        $this->label('Close');
 
         $this->slideOver();
 
-        $this->icon(ActionStatus::REOPENED->getIcon());
+        $this->icon(ActionResolution::RESOLVED->getIcon());
 
-        $this->modalIcon(ActionStatus::REOPENED->getIcon());
+        $this->modalIcon(ActionResolution::RESOLVED->getIcon());
 
-        $this->modalDescription('Reopen this request if you think it has not been resolved yet.');
+        $this->modalHeading('Close request');
+
+        $this->modalDescription('Permanently close this request and mark it as resolved.');
 
         $this->modalWidth(MaxWidth::ExtraLarge);
 
-        $this->successNotificationTitle('Request reopened');
+        $this->closeModalByClickingAway(false);
 
-        $this->failureNotificationTitle('Request reopening failed');
+        $this->successNotificationTitle('Request closed');
+
+        $this->failureNotificationTitle('Request closure failed');
 
         $this->form([
-            MarkdownEditor::make('remarks')
-                ->required()
-                ->helperText('Please provide a brief reason for reopening this request.'),
+            MarkdownEditor::make('remarks'),
             FileAttachment::make(),
         ]);
 
@@ -56,8 +61,9 @@ class ReopenRequestAction extends Action
                 $this->beginDatabaseTransaction();
 
                 $action = $request->actions()->create([
+                    'status' => ActionStatus::CLOSED,
+                    'resolution' => ActionResolution::RESOLVED,
                     'remarks' => $data['remarks'],
-                    'status' => ActionStatus::REOPENED,
                     'user_id' => Auth::id(),
                 ]);
 
@@ -74,12 +80,12 @@ class ReopenRequestAction extends Action
 
                 $this->notifyUsers();
             } catch (Exception) {
-                $this->rollbackDatabaseTransaction();
+                $this->rollBackDatabaseTransaction();
 
                 $this->sendFailureNotification();
             }
         });
 
-        $this->visible(fn (Request $request) => $request->action->status === ActionStatus::COMPLETED);
+        $this->hidden(fn (Request $request) => $request->action->status->finalized() ?: $request->action->status !== ActionStatus::COMPLETED);
     }
 }

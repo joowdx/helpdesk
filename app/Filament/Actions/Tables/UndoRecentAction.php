@@ -12,9 +12,11 @@ class UndoRecentAction extends Action
     private static int $duration = 5;
 
     private static array $undoable = [
+        ActionStatus::QUEUED,
         ActionStatus::STARTED,
         ActionStatus::SUSPENDED,
         ActionStatus::COMPLETED,
+        ActionStatus::CLOSED,
     ];
 
     protected function setUp(): void

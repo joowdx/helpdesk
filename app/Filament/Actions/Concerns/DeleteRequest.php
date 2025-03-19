@@ -49,7 +49,7 @@ trait DeleteRequest
                 return false;
             }
 
-            return ! in_array($request->action->status, [ActionStatus::RETRACTED, ActionStatus::RESTORED]);
+            return ! in_array($request->action->status, [ActionStatus::RECALLED, ActionStatus::RESTORED]);
         });
     }
 }

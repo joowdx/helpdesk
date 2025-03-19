@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions\Concerns\Notifications;
 
+use App\Enums\ActionResolution;
 use App\Enums\ActionStatus;
 use App\Models\Request;
 use App\Models\User;
@@ -12,6 +13,7 @@ use ReflectionClass;
 
 /**
  * @property-read ActionStatus $requestAction
+ * @property-read ActionResolution $requestResolution
  */
 trait CanNotifyUsers
 {
@@ -46,6 +48,7 @@ trait CanNotifyUsers
                 ActionStatus::COMPLETED => "{$request->class->getLabel()} request #{$request->code} completed",
                 ActionStatus::REJECTED => "{$request->class->getLabel()} request assignment rejected",
                 ActionStatus::RESPONDED => "$authenticated->name has responded to ".($authenticated->id !== $request->user_id ? 'your' : 'their')." inquiry #{$request->code}.",
+                ActionStatus::CLOSED => "Request #{$request->code} has been closed",
                 default => null,
             };
 
@@ -61,6 +64,14 @@ trait CanNotifyUsers
                 ActionStatus::COMPLIED => "{$authenticated->name} has complied with your {$request->class->value} request.",
                 ActionStatus::COMPLETED => "The request has been completed successfully by {$authenticated->name}.",
                 ActionStatus::REJECTED => "The assignment has been rejected by {$authenticated->name} for {$request->class->value} request #{$request->code}.",
+                ActionStatus::CLOSED => match (static::$requestResolution ?? ActionResolution::tryFrom($data['resolution'])) {
+                    ActionResolution::RESOLVED => "The request has been successfully resolved by {$authenticated->name}.",
+                    ActionResolution::UNRESOLVED => "The request has been closed without resolution by {$authenticated->name}.",
+                    ActionResolution::INVALIDATED => "The request has been found invalid by {$authenticated->name}.",
+                    ActionResolution::ACKNOWLEDGED => "The request has been acknowledged by {$authenticated->name}.",
+                    ActionResolution::CANCELLED => "The request has been canceled by {$authenticated->name}.",
+                    default => null,
+                },
                 default => null,
             };
 
@@ -68,10 +79,12 @@ trait CanNotifyUsers
                 ActionStatus::SUBMITTED => 'gmdi-move-to-inbox-o',
                 ActionStatus::STARTED => ActionStatus::IN_PROGRESS->getIcon(),
                 ActionStatus::SUSPENDED => ActionStatus::ON_HOLD->getIcon(),
+                ActionStatus::CLOSED => (static::$requestResolution ?? ActionResolution::tryFrom($data['resolution']))->getIcon(),
                 default => static::$requestAction->getIcon(),
             };
 
             $color = match (static::$requestAction) {
+                ActionStatus::CLOSED => (static::$requestResolution ?? ActionResolution::tryFrom($data['resolution']))->getColor(),
                 default => static::$requestAction->getColor(),
             };
 

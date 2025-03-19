@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions\Tables;
 
+use App\Enums\ActionResolution;
 use App\Enums\ActionStatus;
 use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
 use App\Filament\Forms\FileAttachment;
@@ -12,52 +13,55 @@ use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
-class ReopenRequestAction extends Action
+class CancelRequestAction extends Action
 {
     use CanNotifyUsers;
 
-    protected static ?ActionStatus $requestAction = ActionStatus::REOPENED;
+    protected static ?ActionStatus $requestAction = ActionStatus::CLOSED;
+
+    protected static ?ActionResolution $requestResolution = ActionResolution::CANCELLED;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->name('reopen-request');
+        $this->name('cancel-request');
 
-        $this->label('Reopen');
+        $this->label('Cancel');
 
         $this->slideOver();
 
-        $this->icon(ActionStatus::REOPENED->getIcon());
+        $this->icon(ActionResolution::CANCELLED->getIcon());
 
-        $this->modalIcon(ActionStatus::REOPENED->getIcon());
+        $this->modalIcon(ActionResolution::CANCELLED->getIcon());
 
-        $this->modalDescription('Reopen this request if you think it has not been resolved yet.');
+        $this->modalHeading('Cancel request');
+
+        $this->modalDescription('Cancel this request to prevent further processing.');
 
         $this->modalWidth(MaxWidth::ExtraLarge);
 
-        $this->successNotificationTitle('Request reopened');
+        $this->closeModalByClickingAway(false);
 
-        $this->failureNotificationTitle('Request reopening failed');
+        $this->successNotificationTitle('Request cancelled');
+
+        $this->failureNotificationTitle('Request closure failed');
 
         $this->form([
             MarkdownEditor::make('remarks')
                 ->required()
-                ->helperText('Please provide a brief reason for reopening this request.'),
+                ->helperText('Please provide a reason for cancelling this request.'),
             FileAttachment::make(),
         ]);
 
         $this->action(function (Request $request, array $data) {
-            if ($request->action->status !== ActionStatus::COMPLETED) {
-                return;
-            }
-
             try {
                 $this->beginDatabaseTransaction();
 
                 $action = $request->actions()->create([
+                    'status' => ActionStatus::CLOSED,
+                    'resolution' => ActionResolution::CANCELLED,
                     'remarks' => $data['remarks'],
-                    'status' => ActionStatus::REOPENED,
                     'user_id' => Auth::id(),
                 ]);
 
@@ -74,12 +78,15 @@ class ReopenRequestAction extends Action
 
                 $this->notifyUsers();
             } catch (Exception) {
-                $this->rollbackDatabaseTransaction();
+                $this->rollBackDatabaseTransaction();
 
                 $this->sendFailureNotification();
             }
         });
 
-        $this->visible(fn (Request $request) => $request->action->status === ActionStatus::COMPLETED);
+        $this->disabled(fn (Request $request) => in_array($request->action->status, [
+            ActionStatus::COMPLETED,
+            ActionStatus::CLOSED,
+        ]));
     }
 }

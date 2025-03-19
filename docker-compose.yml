@@ -62,10 +62,15 @@ services:
   mailpit:
     image: 'axllent/mailpit:latest'
     container_name: helpdesk.testmail
-    restart: unless-stopped
     ports:
       - '${FORWARD_MAILPIT_PORT:-1025}:1025'
       - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+    environment:
+      APP_ENV: '${APP_ENV:-production}'
+    entrypoint:
+      - sh
+      - '-c'
+      - "if [ \"$APP_ENV\" != \"production\" ]; then\n    exec /mailpit\nelse\n    exit 0\nfi\n"
     networks:
       - helpdesk
 networks:

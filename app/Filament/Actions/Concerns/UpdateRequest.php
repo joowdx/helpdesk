@@ -74,7 +74,7 @@ trait UpdateRequest
         $this->hidden(fn (Request $request): bool => $request->trashed());
 
         $this->visible(fn (Request $request): bool => is_null($request->action) ?: in_array($request->action?->status, [
-            ActionStatus::RETRACTED,
+            ActionStatus::RECALLED,
             ActionStatus::RESTORED,
         ]));
     }

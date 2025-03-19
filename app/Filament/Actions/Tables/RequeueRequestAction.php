@@ -26,6 +26,8 @@ class RequeueRequestAction extends Action
 
         $this->name('requeue-request');
 
+        $this->label('Requeue');
+
         $this->slideOver();
 
         $this->icon(ActionStatus::QUEUED->getIcon());

@@ -9,6 +9,7 @@ use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
+use App\Filament\Clusters\Personal;
 use App\Filament\Clusters\Requests;
 use App\Filament\Filters\OrganizationFilter;
 use App\Filament\Filters\TagFilter;
@@ -22,6 +23,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 abstract class RequestResource extends Resource
 {
@@ -65,20 +67,17 @@ abstract class RequestResource extends Resource
                     ->wrap()
                     ->tooltip(fn ($column) => strlen($column->getState()) > $column->getCharacterLimit() ? $column->getState() : null),
                 TextColumn::make('user.name')
-                    ->description(fn (Request $request) => $request->from->code),
+                    ->description(fn (Request $request) => $request->from->code)
+                    ->hidden(static::$inbound === null),
                 TextColumn::make('organization.code')
                     ->sortable()
                     ->searchable()
                     ->limit(36)
                     ->extraCellAttributes(['class' => 'font-mono'])
                     ->tooltip(fn (Request $request) => $request->organization->name)
-                    ->hidden(! in_array($panel, ['root'])),
+                    ->visible(in_array($panel, ['root']) || static::$inbound === null),
                 TextColumn::make('category.name')
                     ->description(fn (Request $request) => $request->subcategory->name),
-                TextColumn::make('class')
-                    ->badge()
-                    ->alignEnd()
-                    ->visible(static::class === self::class),
                 TextColumn::make('tags.name')
                     ->badge()
                     ->wrap()
@@ -114,7 +113,7 @@ abstract class RequestResource extends Resource
 
         $query = parent::getEloquentQuery()
             ->when(static::$class, fn ($query, $class) => $query->where('class', $class))
-            ->when($panel !== 'root', fn ($query) => $query->whereHas('action', fn ($query) => $query->where('status', '!=', ActionStatus::RETRACTED)));
+            ->when($panel !== 'root' && static::$inbound !== null, fn ($query) => $query->whereHas('action', fn ($query) => $query->where('status', '!=', ActionStatus::RECALLED)));
 
         return match (static::$inbound) {
             true => match ($panel) {

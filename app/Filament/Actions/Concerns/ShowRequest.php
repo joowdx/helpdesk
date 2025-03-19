@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions\Concerns;
 
+use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Models\Request;
 use Filament\Infolists\Components\TextEntry;
@@ -49,6 +50,10 @@ trait ShowRequest
             TextEntry::make('from.name')
                 ->hiddenLabel()
                 ->helperText(fn (Request $request) => $request->user->name),
+            TextEntry::make('action.status')
+                ->hiddenLabel()
+                ->size(TextEntry\TextEntrySize::ExtraSmall)
+                ->state(fn (Request $request) => $request->action->status === ActionStatus::CLOSED ? $request->action->resolution : $request->action->status),
             TextEntry::make('subject')
                 ->hiddenLabel()
                 ->weight(FontWeight::Bold)

@@ -2,17 +2,17 @@
 
 namespace App\Filament\Actions\Tables;
 
-use App\Filament\Actions\Concerns\RetractRequest;
+use App\Filament\Actions\Concerns\RecallRequest;
 use Filament\Tables\Actions\Action;
 
-class RetractRequestAction extends Action
+class RecallRequestAction extends Action
 {
-    use RetractRequest;
+    use RecallRequest;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->bootRetractRequest();
+        $this->bootRecallRequest();
     }
 }

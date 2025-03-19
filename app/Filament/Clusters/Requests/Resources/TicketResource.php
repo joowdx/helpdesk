@@ -84,8 +84,7 @@ class TicketResource extends RequestResource
                     RejectRequestAction::make(),
                     RecategorizeRequestAction::make(),
                     ReclassifyRequestAction::make(),
-                    CloseRequestAction::make()
-                        ->allowResolved(false),
+                    CloseRequestAction::make(),
                 ]),
             ],
             default => parent::tableActions(),

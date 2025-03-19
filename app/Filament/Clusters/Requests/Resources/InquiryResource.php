@@ -69,7 +69,6 @@ class InquiryResource extends RequestResource
                     RecategorizeRequestAction::make(),
                     ReclassifyRequestAction::make(),
                     CloseRequestAction::make()
-                        ->allowResolved(false)
                         ->requireRemarks(false),
                 ]),
             ],

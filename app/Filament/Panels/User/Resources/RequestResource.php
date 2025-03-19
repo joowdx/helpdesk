@@ -10,7 +10,7 @@ use App\Filament\Actions\Tables\ReopenRequestAction;
 use App\Filament\Actions\Tables\RespondRequestAction;
 use App\Filament\Actions\Tables\RestoreRequestAction;
 use App\Filament\Actions\Tables\ResubmitRequestAction;
-use App\Filament\Actions\Tables\RetractRequestAction;
+use App\Filament\Actions\Tables\RecallRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\UpdateRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
@@ -91,7 +91,7 @@ class RequestResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     ReopenRequestAction::make(),
                     UpdateRequestAction::make(),
-                    RetractRequestAction::make()
+                    RecallRequestAction::make()
                         ->label('Retract'),
                     DeleteRequestAction::make(),
                     Tables\Actions\ForceDeleteAction::make()

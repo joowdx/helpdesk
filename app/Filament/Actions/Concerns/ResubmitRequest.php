@@ -18,6 +18,8 @@ trait ResubmitRequest
     {
         $this->name('resubmit-request');
 
+        $this->label('Resubmit');
+
         $this->icon('gmdi-publish-o');
 
         $this->requiresConfirmation();
@@ -49,7 +51,7 @@ trait ResubmitRequest
         });
 
         $this->visible(fn (Request $request): bool => is_null($request->action) ?: in_array($request->action?->status, [
-            ActionStatus::RETRACTED,
+            ActionStatus::RECALLED,
             ActionStatus::RESTORED,
         ]));
 

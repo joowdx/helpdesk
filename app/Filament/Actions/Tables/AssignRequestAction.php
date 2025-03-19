@@ -107,7 +107,7 @@ class AssignRequestAction extends Action
                     'remarks' => User::select('id')
                         ->find($data['assignees'])
                         ->map(fn (User $user) => ['id' => "* {$user->id}"])
-                        ->implode('id'),
+                        ->implode('id', "\n"),
                 ]);
 
                 $request->assignees()->sync(

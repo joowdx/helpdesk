@@ -13,41 +13,41 @@ enum ActionResolution: string implements HasColor, HasDescription, HasIcon, HasL
     case UNRESOLVED = 'unresolved';
     case ACKNOWLEDGED = 'acknowledged';
     case INVALIDATED = 'invalidated';
-    case CANCELED = 'cancelled';
+    case CANCELLED = 'cancelled';
     case NONE = '';
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return match ($this) {
             self::RESOLVED => 'Resolved',
             self::UNRESOLVED => 'Unresolved',
             self::ACKNOWLEDGED => 'Acknowledged',
             self::INVALIDATED => 'Invalidated',
-            self::CANCELED => 'Cancelled',
-            default => 'None',
+            self::CANCELLED => 'Cancelled',
+            default => null,
         };
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return match ($this) {
-            self::RESOLVED => 'The request was resolved.',
-            self::UNRESOLVED => 'The request was unresolved.',
-            self::ACKNOWLEDGED => 'The request was acknowledged.',
-            self::INVALIDATED => 'The request was invalid.',
-            self::CANCELED => 'The request was cancelled.',
-            default => 'No resolution was provided.',
+            self::RESOLVED => 'The request was successfully resolved.',
+            self::UNRESOLVED => 'The request could not be resolved due to insufficient information, technical limitations, or other constraints.',
+            self::ACKNOWLEDGED => 'The request was acknowledged and noted for future reference.',
+            self::INVALIDATED => 'The request was found to be invalid therefore cannot be processed any further.',
+            self::CANCELLED => 'The request was cancelled by the requester.',
+            default => null,
         };
     }
 
     public function getColor(): string|array|null
     {
         return match ($this) {
-            self::UNRESOLVED,
+            self::UNRESOLVED => 'warning',
             self::INVALIDATED => 'danger',
             self::RESOLVED,
             self::ACKNOWLEDGED => 'success',
-            self::CANCELED => 'warning',
+            self::CANCELLED => 'gray',
             default => null,
         };
     }
@@ -58,9 +58,9 @@ enum ActionResolution: string implements HasColor, HasDescription, HasIcon, HasL
             self::UNRESOLVED => 'gmdi-dangerous-o',
             self::RESOLVED,
             self::ACKNOWLEDGED => 'gmdi-done-all-o',
-            self::INVALIDATED => 'gmdi-block-o',
-            self::CANCELED => 'gmdi-cancel-o',
-            default => 'null',
+            self::INVALIDATED => 'gmdi-new-releases-o',
+            self::CANCELLED => 'gmdi-do-not-disturb-on-o',
+            default => null,
         };
     }
 

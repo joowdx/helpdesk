@@ -13,18 +13,16 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
     case RESTORED = 'restored';
     case TRASHED = 'trashed';
     case UPDATED = 'updated';
-    case APPROVED = 'approved';
     case COMPLETED = 'completed';
     case STARTED = 'started';
     case SUBMITTED = 'submitted';
-    case RETRACTED = 'retracted';
+    case RECALLED = 'recalled';
     case QUEUED = 'queued';
     case SUSPENDED = 'suspended';
     case ASSIGNED = 'assigned';
     case ACCEPTED = 'accepted';
     case REJECTED = 'rejected';
     case COMPLIED = 'complied';
-    case VERIFIED = 'verified';
     case REOPENED = 'reopened';
     case RECLASSIFIED = 'reclassified';
     case RECATEGORIZED = 'recategorized';
@@ -39,10 +37,9 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
     {
         return array_filter(self::cases(), fn ($case) => in_array($case->value, [
             self::SUBMITTED->value,
-            self::RETRACTED->value,
+            self::RECALLED->value,
             self::QUEUED->value,
             self::ASSIGNED->value,
-            self::APPROVED->value,
             self::COMPLETED->value,
             self::STARTED->value,
             self::SUSPENDED->value,
@@ -65,19 +62,18 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::RESTORED,
             self::TRASHED => 'gray',
             self::UPDATED => 'info',
-            self::APPROVED => 'success',
             self::COMPLETED => 'success',
             self::REOPENED => 'info',
             self::STARTED => 'info',
             self::SUSPENDED => 'warning',
             self::SUBMITTED => 'success',
-            self::RETRACTED => 'warning',
+            self::RECALLED => 'warning',
             self::ACCEPTED => 'success',
             self::REJECTED,
             self::ASSIGNED,
             self::QUEUED => 'info',
-            self::COMPLIED => 'warning',
-            self::CLOSED => 'danger',
+            self::COMPLIED => 'success',
+            self::CLOSED => 'gray',
             self::ON_HOLD => 'warning',
             default => 'gray'
         };
@@ -95,12 +91,10 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::STARTED => 'The request has been taken up and is in progress.',
             self::SUSPENDED => 'The request has been suspended and is awaiting further action.',
             self::SUBMITTED => 'The request has been published by the user.',
-            self::RETRACTED => 'The request has been retracted by the requestor and is waiting to be republished.',
+            self::RECALLED => 'The request has been retracted by the requestor and is waiting to be republished.',
             self::COMPLIED => 'The user submitted the lacking documents.',
-            self::APPROVED => 'The request has been accepted and is being processed.',
             self::REJECTED => 'The request assignment has been rejected.',
             self::ASSIGNED => 'The request has been assigned to a user.',
-            self::QUEUED => 'The request has been queued and is awaiting processing.',
             self::REOPENED => 'The request has been reopened for further action.',
             default => null
         };
@@ -109,23 +103,22 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
     public function getIcon(): ?string
     {
         return match ($this) {
-            self::QUEUED => 'gmdi-start-o',
+            self::QUEUED => 'gmdi-rotate-90-degrees-ccw-o',
             self::RESTORED => 'gmdi-restore-o',
             self::TRASHED => 'gmdi-delete-o',
             self::UPDATED => 'gmdi-update-o',
-            self::APPROVED => 'gmdi-verified-o',
             self::COMPLETED => 'gmdi-task-alt-o',
             self::STARTED => 'gmdi-alarm-o',
             self::SUSPENDED => 'gmdi-front-hand-o',
             self::SUBMITTED => 'gmdi-publish-o',
-            self::RETRACTED => 'gmdi-settings-backup-restore-o',
+            self::RECALLED => 'gmdi-settings-backup-restore-o',
             self::ASSIGNED => 'gmdi-supervisor-account-o',
             self::ACCEPTED => 'gmdi-published-with-changes-o',
             self::REJECTED => 'gmdi-person-off-o',
-            self::COMPLIED => 'gmdi-task-r',
-            self::RECATEGORIZED => 'gmdi-playlist-add-check-circle-o',
-            self::RECLASSIFIED => 'gmdi-swap-horizontal-circle-o',
-            self::CLOSED => 'gmdi-cancel-o',
+            self::COMPLIED => 'gmdi-fact-check-o',
+            self::RECATEGORIZED => 'gmdi-move-down-o',
+            self::RECLASSIFIED => 'gmdi-read-more-o',
+            self::CLOSED => 'gmdi-close-o',
             self::REOPENED => 'gmdi-replay-o',
             self::TAGGED => 'gmdi-sell-o',
             self::RESPONDED => 'gmdi-chat-o',
@@ -147,36 +140,27 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
 
         $label = match ($type) {
             'nounForm' => match ($this->value) {
+                'submitted' => 'submission',
                 'updated' => 'update',
-                'approved' => 'approval',
-                'declined' => 'declination',
+                'queued' => 'queue',
                 'completed' => 'completion',
                 'cancelled' => 'cancellation',
-                'initiated' => 'initiation',
                 'suspended' => 'suspension',
-                'published' => 'publication',
-                'retracted' => 'retraction',
+                'recalled' => 'recall',
                 'assigned' => 'assignment',
-                'accepted' => 'acceptance',
                 'rejected' => 'rejection',
-                'adjusted' => 'adjustment',
-                'scheduled' => 'scheduling',
-                'extended' => 'extension',
-                'verified' => 'verification',
-                'denied' => 'denial',
-                'ammended' => 'alter',
                 'responded' => 'response',
                 'reclassified' => 'reclassification',
                 'recategorized' => 'recategorization',
                 'tagged' => 'tag',
+                'closed' => 'closure',
                 default => $this->value,
             },
             'presentTense' => match ($this->value) {
-                'approved' => 'approve',
                 'cancelled' => 'cancel',
                 'declined' => 'decline',
-                'scheduled' => 'schedule',
                 'completed' => 'complete',
+                'submitted' => 'submit',
                 'tagged' => 'tag',
                 'closed' => 'close',
                 default => substr($this->value, 0, -2),
