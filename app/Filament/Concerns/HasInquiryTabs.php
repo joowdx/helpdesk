@@ -3,9 +3,12 @@
 namespace App\Filament\Concerns;
 
 use App\Enums\ActionStatus;
+use App\Enums\RequestClass;
+use App\Enums\UserRole;
 use Filament\Facades\Filament;
 use Filament\Resources\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @mixin \App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries
@@ -16,7 +19,7 @@ trait HasInquiryTabs
 {
     public function getTabs(): array
     {
-        $panel = Filament::getCurrentPanel()->getId();
+        $role = Auth::user()->role;
 
         $inbound = static::getResource()::$inbound;
 
@@ -24,9 +27,9 @@ trait HasInquiryTabs
 
         return [
             'all' => Tab::make('All')
-                ->icon('heroicon-o-ticket')
+                ->icon(RequestClass::INQUIRY->getIcon())
                 ->badge(fn () => $query()->count()),
-            ...(in_array($panel, ['admin', 'moderator', 'root']) ? [
+            ...(in_array($role, [UserRole::ADMIN, UserRole::MODERATOR, UserRole::ROOT]) ? [
                 $inbound ? 'submitted' : 'received' => Tab::make($inbound ? 'Submitted' : 'Received')
                     ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::SUBMITTED))
                     ->icon(! $inbound ? 'gmdi-inbox-o' : ActionStatus::SUBMITTED->getIcon())
@@ -36,7 +39,7 @@ trait HasInquiryTabs
                     ->icon(ActionStatus::ASSIGNED->getIcon())
                     ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::ASSIGNED)->count()),
             ] : []),
-            ...($panel !== 'root' ? [
+            ...($role !== UserRole::ROOT ? [
                 'pending' => Tab::make('Pending')
                     ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::ASSIGNED))
                     ->icon('gmdi-hourglass-empty-o')

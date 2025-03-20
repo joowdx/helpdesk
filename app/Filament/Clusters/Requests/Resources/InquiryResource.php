@@ -3,20 +3,26 @@
 namespace App\Filament\Clusters\Requests\Resources;
 
 use App\Enums\RequestClass;
+use App\Enums\UserRole;
 use App\Filament\Actions\Tables\AssignRequestAction;
 use App\Filament\Actions\Tables\CloseRequestAction;
 use App\Filament\Actions\Tables\CompleteRequestAction;
+use App\Filament\Actions\Tables\DeleteRequestAction;
 use App\Filament\Actions\Tables\RecategorizeRequestAction;
 use App\Filament\Actions\Tables\ReclassifyRequestAction;
+use App\Filament\Actions\Tables\RejectRequestAction;
+use App\Filament\Actions\Tables\RequeueRequestAction;
 use App\Filament\Actions\Tables\RespondRequestAction;
+use App\Filament\Actions\Tables\RestoreRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\NewInquiry;
 use App\Filament\Resources\RequestResource;
-use Filament\Facades\Filament;
+use Filament\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\ActionGroup;
+use Illuminate\Support\Facades\Auth;
 
 class InquiryResource extends RequestResource
 {
@@ -38,41 +44,51 @@ class InquiryResource extends RequestResource
 
     public static function tableActions(): array
     {
-        $moderator = [
-            CompleteRequestAction::make(),
-            RespondRequestAction::make(),
-            AssignRequestAction::make(),
-            ShowRequestAction::make(),
-            ViewRequestHistoryAction::make(),
-            ActionGroup::make([
-                TagRequestAction::make(),
-                RecategorizeRequestAction::make(),
-                ReclassifyRequestAction::make(),
-                CloseRequestAction::make()
-                    ->requireRemarks(false),
-            ]),
-        ];
-
-        return match (Filament::getCurrentPanel()->getId()) {
-            'admin' => static::$inbound ? $moderator : [
-                ShowRequestAction::make(),
-                ViewRequestHistoryAction::make(),
+        return match (Auth::user()->role) {
+            UserRole::ROOT => [
+                ShowRequestAction::make()
+                    ->hidden(false),
+                ViewRequestHistoryAction::make()
+                    ->hidden(false),
+                ActionGroup::make([
+                    RestoreRequestAction::make(),
+                    DeleteRequestAction::make(),
+                    ForceDeleteAction::make()
+                        ->label('Purge'),
+                ]),
             ],
-            'moderator' => $moderator,
-            'agent' => [
-                CompleteRequestAction::make(),
+            UserRole::ADMIN, UserRole::MODERATOR => [
                 RespondRequestAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
                     TagRequestAction::make(),
+                    CompleteRequestAction::make(),
+                    AssignRequestAction::make(),
+                    RequeueRequestAction::make(),
+                    RejectRequestAction::make(),
                     RecategorizeRequestAction::make(),
                     ReclassifyRequestAction::make(),
                     CloseRequestAction::make()
                         ->requireRemarks(false),
                 ]),
             ],
-            default => parent::tableActions(),
+            UserRole::AGENT => [
+                RespondRequestAction::make(),
+                ShowRequestAction::make(),
+                ViewRequestHistoryAction::make(),
+                ActionGroup::make([
+                    TagRequestAction::make(),
+                    CompleteRequestAction::make(),
+                    RequeueRequestAction::make(),
+                    RejectRequestAction::make(),
+                    RecategorizeRequestAction::make(),
+                    ReclassifyRequestAction::make(),
+                    CloseRequestAction::make()
+                        ->requireRemarks(false),
+                ]),
+            ],
+            default => [],
         };
     }
 }

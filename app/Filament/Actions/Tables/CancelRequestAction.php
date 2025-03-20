@@ -87,14 +87,19 @@ class CancelRequestAction extends Action
 
         $this->disabled(function (Request $request) {
             return match ($request->class) {
-                RequestClass::TICKET => in_array($request->action->status, [
-                    ActionStatus::COMPLETED,
-                    ActionStatus::CLOSED,
-                ]),
-                RequestClass::INQUIRY => in_array($request->action->status, [
-                    ActionStatus::SUBMITTED,
-                    ActionStatus::CLOSED,
-                ]),
+                RequestClass::TICKET => $request->action->created_at->addHours(24)->greaterThan(now()) &&
+                    in_array($request->action->status, [
+                        ActionStatus::COMPLETED,
+                        ActionStatus::CLOSED,
+                    ]),
+                RequestClass::INQUIRY => $request->action->created_at->addHours(24)->greaterThan(now()) &&
+                    in_array($request->action->status, [
+                        ActionStatus::CLOSED,
+                    ]),
+                RequestClass::SUGGESTION => $request->action->created_at->addHours(24)->greaterThan(now()) &&
+                    in_array($request->action->status, [
+                        ActionStatus::CLOSED,
+                    ]),
             };
         });
     }

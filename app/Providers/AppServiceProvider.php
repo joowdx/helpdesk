@@ -19,6 +19,7 @@ use Filament\View\PanelsRenderHook;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -40,6 +41,10 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
         }
 
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         $this->configureFilament();
     }
 
@@ -47,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
     {
         FilamentView::registerRenderHook(PanelsRenderHook::HEAD_START, fn () => Blade::render('@vite(\'resources/css/app.css\')'));
 
-        FilamentView::registerRenderHook(PanelsRenderHook::TOPBAR_START, fn () => Blade::render('<div class="flex h-16 px-4 md:px-6 lg:px-8 items-center gap-x-4 max-w-screen-2xl mx-auto w-full 2xl:px-8">'));
+        FilamentView::registerRenderHook(PanelsRenderHook::TOPBAR_START, fn () => Blade::render('<div class="flex items-center w-full h-16 px-4 mx-auto md:px-6 lg:px-8 gap-x-4 max-w-screen-2xl 2xl:px-8">'));
 
         FilamentView::registerRenderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render('</div>'));
 

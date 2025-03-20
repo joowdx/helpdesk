@@ -20,6 +20,8 @@ class AcknowledgeRequestAction extends Action
 
     protected static ?ActionStatus $requestAction = ActionStatus::CLOSED;
 
+    protected static ?ActionResolution $requestResolution = ActionResolution::ACKNOWLEDGED;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -34,7 +36,7 @@ class AcknowledgeRequestAction extends Action
 
         $this->modalIcon(ActionResolution::ACKNOWLEDGED->getIcon());
 
-        $this->modalHeading('Acknowledge Request');
+        $this->modalHeading('Acknowledge request');
 
         $this->modalDescription('Close and acknowledge this request.');
 

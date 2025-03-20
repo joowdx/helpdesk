@@ -3,14 +3,17 @@
 namespace App\Filament\Clusters\Requests\Resources;
 
 use App\Enums\RequestClass;
+use App\Enums\UserRole;
 use App\Filament\Actions\Tables\AssignRequestAction;
 use App\Filament\Actions\Tables\CloseRequestAction;
 use App\Filament\Actions\Tables\CompleteRequestAction;
+use App\Filament\Actions\Tables\DeleteRequestAction;
 use App\Filament\Actions\Tables\QueueRequestAction;
 use App\Filament\Actions\Tables\RecategorizeRequestAction;
 use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\RejectRequestAction;
 use App\Filament\Actions\Tables\RequeueRequestAction;
+use App\Filament\Actions\Tables\RestoreRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\StartRequestAction;
 use App\Filament\Actions\Tables\SuspendRequestAction;
@@ -20,8 +23,9 @@ use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListTickets;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\NewTicket;
 use App\Filament\Resources\RequestResource;
-use Filament\Facades\Filament;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Illuminate\Support\Facades\Auth;
 
 class TicketResource extends RequestResource
 {
@@ -45,40 +49,29 @@ class TicketResource extends RequestResource
 
     public static function tableActions(): array
     {
-        $moderator = [
-            StartRequestAction::make(),
-            CompleteRequestAction::make(),
-            QueueRequestAction::make(),
-            UndoRecentAction::make(),
-            ShowRequestAction::make(),
-            ViewRequestHistoryAction::make(),
-            ActionGroup::make([
-                TagRequestAction::make(),
-                SuspendRequestAction::make(),
-                AssignRequestAction::make(),
-                RequeueRequestAction::make(),
-                RejectRequestAction::make(),
-                RecategorizeRequestAction::make(),
-                ReclassifyRequestAction::make(),
-                CloseRequestAction::make()
-                    ->requireRemarks(false),
-            ]),
-        ];
-
-        return match (Filament::getCurrentPanel()->getId()) {
-            'admin' => static::$inbound ? $moderator : [
-                ShowRequestAction::make(),
-                ViewRequestHistoryAction::make(),
+        return match (Auth::user()->role) {
+            UserRole::ROOT => [
+                ShowRequestAction::make()
+                    ->hidden(false),
+                ViewRequestHistoryAction::make()
+                    ->hidden(false),
+                ActionGroup::make([
+                    RestoreRequestAction::make(),
+                    DeleteRequestAction::make(),
+                    ForceDeleteAction::make()
+                        ->label('Purge'),
+                ]),
             ],
-            'moderator' => $moderator,
-            'agent' => [
+            UserRole::ADMIN, UserRole::MODERATOR => [
                 StartRequestAction::make(),
-                CompleteRequestAction::make(),
-                UndoRecentAction::make(),
+                QueueRequestAction::make(),
+                AssignRequestAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
                     TagRequestAction::make(),
+                    CompleteRequestAction::make(),
+                    UndoRecentAction::make(),
                     SuspendRequestAction::make(),
                     RequeueRequestAction::make(),
                     RejectRequestAction::make(),
@@ -87,7 +80,23 @@ class TicketResource extends RequestResource
                     CloseRequestAction::make(),
                 ]),
             ],
-            default => parent::tableActions(),
+            UserRole::AGENT => [
+                StartRequestAction::make(),
+                ShowRequestAction::make(),
+                ViewRequestHistoryAction::make(),
+                ActionGroup::make([
+                    TagRequestAction::make(),
+                    CompleteRequestAction::make(),
+                    UndoRecentAction::make(),
+                    SuspendRequestAction::make(),
+                    RequeueRequestAction::make(),
+                    RejectRequestAction::make(),
+                    RecategorizeRequestAction::make(),
+                    ReclassifyRequestAction::make(),
+                    CloseRequestAction::make(),
+                ]),
+            ],
+            default => [],
         };
     }
 }

@@ -6,7 +6,9 @@ use App\Enums\RequestClass;
 use App\Filament\Actions\Tables\CancelRequestAction;
 use App\Filament\Actions\Tables\RecallRequestAction;
 use App\Filament\Actions\Tables\ReopenRequestAction;
+use App\Filament\Actions\Tables\ResolveRequestAction;
 use App\Filament\Actions\Tables\RespondRequestAction;
+use App\Filament\Actions\Tables\ResubmitRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\UndoRecentAction;
 use App\Filament\Actions\Tables\UpdateRequestAction;
@@ -43,6 +45,8 @@ class InquiryResource extends RequestResource
     {
         return [
             RespondRequestAction::make(),
+            ResubmitRequestAction::make(),
+            ResolveRequestAction::make(),
             ShowRequestAction::make(),
             ViewRequestHistoryAction::make(),
             ActionGroup::make([

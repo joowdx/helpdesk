@@ -18,10 +18,12 @@ trait DeleteRequest
                 $this->beginDatabaseTransaction();
 
                 $result = $this->process(static function (Request $request) {
-                    return $request->delete() && $request->action()->create([
-                        'status' => ActionStatus::TRASHED,
-                        'user_id' => Auth::id(),
-                    ]);
+                    return Auth::user()->root
+                        ? $request->delete()
+                        : $request->delete() && $request->action()->create([
+                            'status' => ActionStatus::TRASHED,
+                            'user_id' => Auth::id(),
+                        ]);
                 });
 
                 if (! $result) {
@@ -38,18 +40,6 @@ trait DeleteRequest
 
                 $this->failure();
             }
-        });
-
-        $this->hidden(function (Request $request) {
-            if ($request->trashed()) {
-                return true;
-            }
-
-            if (is_null($request->action)) {
-                return false;
-            }
-
-            return ! in_array($request->action->status, [ActionStatus::RECALLED, ActionStatus::RESTORED]);
         });
     }
 }

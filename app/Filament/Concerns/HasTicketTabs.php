@@ -3,6 +3,7 @@
 namespace App\Filament\Concerns;
 
 use App\Enums\ActionStatus;
+use App\Enums\RequestClass;
 use Filament\Facades\Filament;
 use Filament\Resources\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,7 +26,7 @@ trait HasTicketTabs
 
         return [
             'all' => Tab::make('All')
-                ->icon('heroicon-o-ticket')
+            ->icon(RequestClass::TICKET->getIcon())
                 ->badge(fn () => $query()->count()),
             ...(in_array($panel, ['admin', 'moderator', 'root']) ? [
                 $inbound ? 'received' : 'submitted' => Tab::make($inbound ? 'Received' : 'Submitted')

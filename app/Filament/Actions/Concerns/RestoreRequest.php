@@ -20,10 +20,12 @@ trait RestoreRequest
             }
 
             $result = $this->process(static function () use ($request): bool {
-                return $request->restore() && $request->actions()->create([
-                    'status' => ActionStatus::RESTORED,
-                    'user_id' => Auth::id(),
-                ]);
+                return Auth::user()->root
+                    ? $request->restore()
+                    : $request->restore() && $request->actions()->create([
+                        'status' => ActionStatus::RESTORED,
+                        'user_id' => Auth::id(),
+                    ]);
             });
 
             if (! $result) {

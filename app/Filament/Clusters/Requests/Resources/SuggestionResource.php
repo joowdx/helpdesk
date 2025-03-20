@@ -6,8 +6,8 @@ use App\Enums\RequestClass;
 use App\Enums\UserRole;
 use App\Filament\Actions\Tables\AcknowledgeRequestAction;
 use App\Filament\Actions\Tables\AssignRequestAction;
-use App\Filament\Actions\Tables\CloseRequestAction;
 use App\Filament\Actions\Tables\DeleteRequestAction;
+use App\Filament\Actions\Tables\InvalidateRequestAction;
 use App\Filament\Actions\Tables\RejectRequestAction;
 use App\Filament\Actions\Tables\RestoreRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
@@ -17,6 +17,7 @@ use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListSuggestio
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\NewSuggestion;
 use App\Filament\Resources\RequestResource;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\ForceDeleteAction;
 use Illuminate\Support\Facades\Auth;
 
 class SuggestionResource extends RequestResource
@@ -41,14 +42,15 @@ class SuggestionResource extends RequestResource
     {
         return match (Auth::user()->role) {
             UserRole::ROOT => [
-                RestoreRequestAction::make(),
                 ShowRequestAction::make()
                     ->hidden(false),
                 ViewRequestHistoryAction::make()
                     ->hidden(false),
                 ActionGroup::make([
-                    DeleteRequestAction::make()
-                        ->hidden(false),
+                    RestoreRequestAction::make(),
+                    DeleteRequestAction::make(),
+                    ForceDeleteAction::make()
+                        ->label('Purge'),
                 ]),
             ],
             UserRole::ADMIN, UserRole::MODERATOR => [
@@ -58,8 +60,7 @@ class SuggestionResource extends RequestResource
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
                     TagRequestAction::make(),
-                    CloseRequestAction::make()
-                        ->requireRemarks(false),
+                    InvalidateRequestAction::make(),
                 ]),
             ],
             UserRole::AGENT => [
@@ -69,11 +70,10 @@ class SuggestionResource extends RequestResource
                 ActionGroup::make([
                     TagRequestAction::make(),
                     RejectRequestAction::make(),
-                    CloseRequestAction::make()
-                        ->requireRemarks(false),
+                    InvalidateRequestAction::make(),
                 ]),
             ],
-            default => parent::tableActions(),
+            default => [],
         };
     }
 }

@@ -65,7 +65,7 @@ abstract class RequestResource extends Resource
                     ->wrap()
                     ->tooltip(fn ($column) => strlen($column->getState()) > $column->getCharacterLimit() ? $column->getState() : null),
                 TextColumn::make('user.name')
-                    ->description(fn (Request $request) => $request->from->code)
+                    ->description(fn (Request $request) => $request->from?->code)
                     ->hidden(static::$inbound === null),
                 TextColumn::make('organization.code')
                     ->sortable()
@@ -152,18 +152,7 @@ abstract class RequestResource extends Resource
         };
     }
 
-    public static function tableActions(): array
-    {
-        return [
-            ShowRequestAction::make(),
-            ViewRequestHistoryAction::make(),
-            ActionGroup::make([
-                TagRequestAction::make(),
-                RecategorizeRequestAction::make(),
-                ReclassifyRequestAction::make(),
-            ]),
-        ];
-    }
+    public static abstract function tableActions(): array;
 
     public static function tableBulkActions(): array
     {
