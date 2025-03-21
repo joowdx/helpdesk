@@ -116,7 +116,7 @@ abstract class RequestResource extends Resource
         return match (static::$inbound) {
             true => match ($panel) {
                 'root' => $query,
-                'admin' => $query->where('from_id', Auth::user()->organization_id),
+                'admin' => $query->where('organization_id', Auth::user()->organization_id),
                 'moderator' => $query->where('organization_id', Auth::user()->organization_id),
                 'agent' => $query->whereHas('assignees', fn ($query) => $query->where('assigned_id', Auth::id())),
                 default => $query->whereRaw('1 = 0'),
