@@ -47,7 +47,7 @@ trait CanNotifyUsers
                 ActionStatus::COMPLIED => "{$request->class->getLabel()} request #{$request->code} complied",
                 ActionStatus::COMPLETED => "{$request->class->getLabel()} request #{$request->code} completed",
                 ActionStatus::REJECTED => "{$request->class->getLabel()} request assignment rejected",
-                ActionStatus::RESPONDED => "$authenticated->name has responded to ".($authenticated->id !== $request->user_id ? 'your' : 'their')." inquiry #{$request->code}.",
+                ActionStatus::REPLIED => "$authenticated->name has replied to ".($authenticated->id !== $request->user_id ? 'your' : 'their')." inquiry #{$request->code}.",
                 ActionStatus::CLOSED => "Request #{$request->code} has been closed",
                 default => null,
             };

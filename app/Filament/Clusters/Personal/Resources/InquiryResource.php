@@ -7,8 +7,8 @@ use App\Filament\Actions\Tables\CancelRequestAction;
 use App\Filament\Actions\Tables\CompileRequestAction;
 use App\Filament\Actions\Tables\RecallRequestAction;
 use App\Filament\Actions\Tables\ReopenRequestAction;
+use App\Filament\Actions\Tables\ReplyRequestAction;
 use App\Filament\Actions\Tables\ResolveRequestAction;
-use App\Filament\Actions\Tables\RespondRequestAction;
 use App\Filament\Actions\Tables\ResubmitRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\UndoRecentAction;
@@ -45,7 +45,7 @@ class InquiryResource extends RequestResource
     public static function tableActions(): array
     {
         return [
-            RespondRequestAction::make(),
+            ReplyRequestAction::make(),
             ResubmitRequestAction::make(),
             ResolveRequestAction::make(),
             ShowRequestAction::make(),

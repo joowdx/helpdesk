@@ -12,8 +12,8 @@ use App\Filament\Actions\Tables\DeleteRequestAction;
 use App\Filament\Actions\Tables\RecategorizeRequestAction;
 use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\RejectRequestAction;
+use App\Filament\Actions\Tables\ReplyRequestAction;
 use App\Filament\Actions\Tables\RequeueRequestAction;
-use App\Filament\Actions\Tables\RespondRequestAction;
 use App\Filament\Actions\Tables\RestoreRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
@@ -62,7 +62,7 @@ class InquiryResource extends RequestResource
                 ]),
             ],
             UserRole::ADMIN, UserRole::MODERATOR => [
-                RespondRequestAction::make(),
+                ReplyRequestAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
@@ -79,7 +79,7 @@ class InquiryResource extends RequestResource
                 ]),
             ],
             UserRole::AGENT => [
-                RespondRequestAction::make(),
+                ReplyRequestAction::make(),
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 ActionGroup::make([
