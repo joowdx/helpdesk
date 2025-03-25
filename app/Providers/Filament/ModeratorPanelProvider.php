@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Panels\Auth\Pages\Profile;
 use App\Http\Middleware\Active;
 use App\Http\Middleware\Approve;
 use App\Http\Middleware\Authenticate;
@@ -31,6 +32,7 @@ class ModeratorPanelProvider extends PanelProvider
             ->id('moderator')
             ->path('moderator')
             ->homeUrl('/')
+            ->profile(Profile::class)
             ->brandLogo(fn () => view('banner'))
             ->font('Urbanist')
             ->colors([...Color::all(), 'gray' => Color::Neutral])
