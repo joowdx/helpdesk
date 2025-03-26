@@ -7,6 +7,7 @@ use App\Enums\RequestClass;
 use App\Filament\Clusters\Requests;
 use App\Filament\Filters\OrganizationFilter;
 use App\Filament\Filters\TagFilter;
+use App\Models\Action;
 use App\Models\Request;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
@@ -70,6 +71,11 @@ abstract class RequestResource extends Resource
                     ->visible(in_array($panel, ['root']) || static::$inbound === null),
                 TextColumn::make('category.name')
                     ->description(fn (Request $request) => $request->subcategory->name),
+                TextColumn::make('assignees.name')
+                    ->searchable(['name', 'email'])
+                    ->bulleted()
+                    ->limitList(1)
+                    ->expandableLimitedList(),
                 TextColumn::make('tags.name')
                     ->badge()
                     ->wrap()
@@ -85,7 +91,17 @@ abstract class RequestResource extends Resource
             ->filters(static::tableFilters())
             ->actions(static::tableActions())
             ->bulkActions(static::tableBulkActions())
-            ->recordAction(null);
+            ->recordAction(null)
+            ->defaultSort(
+                fn (Builder $query) => $query->orderBy(
+                    Action::query()
+                        ->select('id')
+                        ->whereColumn('actions.request_id', 'requests.id')
+                        ->latest()
+                        ->limit(1),
+                    'desc'
+                ),
+            );
     }
 
     public static function getNavigationBadge(): ?string
