@@ -15,7 +15,6 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -63,7 +62,7 @@ class UserPanelProvider extends PanelProvider
                 Initialize::class,
             ])
             ->globalSearch(false)
-            ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
+            ->maxContentWidth('max-w-[1920px]')
             ->databaseTransactions()
             ->databaseNotifications()
             ->topNavigation()
