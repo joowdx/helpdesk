@@ -61,25 +61,21 @@
                                     Get started
                                 </x-filament::button>
                             </div>
-
-                            <div class="opacity-0">
+                        </div>
+                        <div class="text-center sm:mx-auto sm:w-10/12 lg:mr-auto lg:mt-0 lg:w-4/5">
+                            <div class="hidden">
                                 {{ $this->result }}
                             </div>
 
                             <p class="hidden max-w-2xl mx-auto mt-12 text-lg text-gray-700 text-wrap sm:block dark:text-gray-200">
-                                Or search existing tickets below:
+                                Or search existing tickets:
                             </p>
                             <p class="max-w-2xl mx-auto mt-8 text-gray-700 text-wrap sm:hidden dark:text-gray-200">
-                                Or search existing tickets below:
+                                Or search existing tickets:
                             </p>
-                            <div class="flex justify-center gap-4 mt-8">
-                                <x-filament-panels::form id="form" wire:submit='search' class="w-full max-w-2xl" >
+                            <div class="flex justify-center gap-4 mt-2">
+                                <x-filament-panels::form id="form" wire:submit='search' class="w-full max-w-lg" >
                                     {{ $this->form }}
-
-                                    <x-filament-panels::form.actions
-                                        :actions="$this->getCachedFormActions()"
-                                        :full-width="$this->hasFullWidthFormActions()"
-                                    />
                                 </x-filament-panels::form>
                             </div>
                         </div>

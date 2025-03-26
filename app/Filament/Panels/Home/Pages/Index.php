@@ -6,21 +6,19 @@ use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Models\Request;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
-use Filament\Pages\Concerns\InteractsWithFormActions;
 use Filament\Pages\Page;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\MaxWidth;
 
 class Index extends Page
 {
-    use InteractsWithFormActions;
-
     public array $data = [];
 
     protected static string $layout = 'filament-panels::components.layout.base';
@@ -42,27 +40,29 @@ class Index extends Page
             ->schema([
                 TextInput::make('code')
                     ->label('Code')
+                    ->hiddenLabel()
                     ->extraInputAttributes(['class' => 'font-mono'])
-                    ->prefixIcon('gmdi-tag-o')
                     ->string()
                     ->rule('required')
                     ->markAsRequired()
                     ->exists('requests', 'code')
                     ->maxLength(11)
-                    ->mutateStateForValidationUsing(fn (string $state) => preg_replace("/[^a-zA-Z0-9]/", "", $state))
-                    ->dehydrateStateUsing(fn (string $state) => preg_replace("/[^a-zA-Z0-9]/", "", $state)),
+                    ->placeholder('#zxywvu9876')
+                    ->mutateStateForValidationUsing(fn (?string $state) => preg_replace('/[^a-zA-Z0-9]/', '', $state))
+                    ->dehydrateStateUsing(fn (?string $state) => preg_replace('/[^a-zA-Z0-9]/', '', $state))
+                    ->validationMessages([
+                        'exists' => 'Request not found.',
+                        'required' => 'Please enter a request code',
+                    ])
+                    ->prefixAction(
+                        FormAction::make('search')
+                            ->icon('gmdi-search-o')
+                            ->submit('search')
+                            ->color('primary')
+                            ->extraAttributes(['class' => 'font-mono'])
+                    ),
             ])
             ->statePath('data');
-    }
-
-    public function getFormActions(): array
-    {
-        return [
-            Action::make('search')
-                ->icon('gmdi-search-o')
-                ->requiresConfirmation()
-                ->submit('search'),
-        ];
     }
 
     public function search(): void
@@ -70,6 +70,8 @@ class Index extends Page
         $this->replaceMountedAction('result', [
             $this->form->getState()['code'],
         ]);
+
+        $this->form->fill(['code' => '']);
     }
 
     public function result(): Action
