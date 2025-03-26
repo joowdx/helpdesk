@@ -57,7 +57,7 @@ class UserResource extends Resource
                     ->markAsRequired()
                     ->rule('required')
                     ->prefixIcon('heroicon-o-user-circle')
-                    ->dehydrateStateUsing(fn ($state) => $this->formatName($state)),
+                    ->dehydrateStateUsing(fn ($state) => static::nameFormatter($state)),
                 Forms\Components\TextInput::make('designation')
                     ->prefixIcon('heroicon-o-briefcase'),
                 Forms\Components\Select::make('organization_id')
