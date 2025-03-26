@@ -98,6 +98,7 @@ abstract class RequestResource extends Resource
                     Action::query()
                         ->select('id')
                         ->whereColumn('actions.request_id', 'requests.id')
+                        ->where('status', ActionStatus::SUBMITTED)
                         ->latest()
                         ->limit(1),
                     'desc'
