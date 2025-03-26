@@ -126,6 +126,7 @@ class Profile extends EditProfile
                                     ->hintIcon('heroicon-o-question-mark-circle')
                                     ->hintIconTooltip('The specimen should be a PNG or WebP image with a transparent background.')
                                     ->acceptedFileTypes(['image/png', 'image/webp'])
+                                    ->maxSize(2048)
                                     ->markAsRequired(false),
                                 FileUpload::make('certificate')
                                     ->acceptedFileTypes(['application/x-pkcs12'])
