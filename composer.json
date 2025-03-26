@@ -15,6 +15,7 @@
         "laravel/pulse": "^1.4",
         "laravel/reverb": "^1.4",
         "laravel/tinker": "^2.10",
+        "lsnepomuceno/laravel-a1-pdf-sign": "^1.4",
         "mailersend/laravel-driver": "^2.8",
         "resend/resend-php": "^0.15.2",
         "sunspikes/clamav-validator": "^1.6",

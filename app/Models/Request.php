@@ -86,7 +86,7 @@ class Request extends Model
             ->latest();
     }
 
-    public function submitted(): HasOne
+    public function submission(): HasOne
     {
         return $this->hasOne(Action::class)
             ->ofMany(['id' => 'max'], fn ($query) => $query->where('status', ActionStatus::SUBMITTED));
