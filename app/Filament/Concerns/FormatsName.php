@@ -6,7 +6,7 @@ trait FormatsName
 {
     public static function nameFormatter(?string $value)
     {
-        return (new static())->formatName($value);
+        return (new static)->formatName($value);
     }
 
     public function formatName(?string $value)

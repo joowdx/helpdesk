@@ -157,7 +157,7 @@ abstract class RequestResource extends Resource
                     ->withUnaffiliated(false),
                 TrashedFilter::make(),
             ],
-            default => match(static::$inbound) {
+            default => match (static::$inbound) {
                 true => [
                     SelectFilter::make('categories')
                         ->relationship(
