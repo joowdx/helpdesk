@@ -44,11 +44,13 @@ class Index extends Page
                     ->label('Code')
                     ->extraInputAttributes(['class' => 'font-mono'])
                     ->prefixIcon('gmdi-tag-o')
+                    ->string()
                     ->rule('required')
-                    ->alphaNum()
                     ->markAsRequired()
                     ->exists('requests', 'code')
-                    ->maxLength(10),
+                    ->maxLength(11)
+                    ->mutateStateForValidationUsing(fn (string $state) => preg_replace("/[^a-zA-Z0-9]/", "", $state))
+                    ->dehydrateStateUsing(fn (string $state) => preg_replace("/[^a-zA-Z0-9]/", "", $state)),
             ])
             ->statePath('data');
     }
