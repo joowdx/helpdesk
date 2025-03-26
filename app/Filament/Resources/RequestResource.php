@@ -8,6 +8,7 @@ use App\Filament\Clusters\Requests;
 use App\Filament\Filters\OrganizationFilter;
 use App\Filament\Filters\TagFilter;
 use App\Models\Action;
+use App\Models\Category;
 use App\Models\Request;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
@@ -156,9 +157,31 @@ abstract class RequestResource extends Resource
                     ->withUnaffiliated(false),
                 TrashedFilter::make(),
             ],
-            default => [
-                TagFilter::make(),
-            ],
+            default => match(static::$inbound) {
+                true => [
+                    SelectFilter::make('categories')
+                        ->relationship(
+                            'subcategory',
+                            'name',
+                            fn (Builder $query) => $query
+                                ->with('category')
+                                ->whereRelation('category', 'categories.organization_id', Auth::user()->organization_id)
+                                ->orderBy(
+                                    Category::select('name')
+                                        ->whereColumn('categories.id', 'subcategories.category_id'),
+                                ),
+                        )
+                        ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->category->name} — {$record->name}")
+                        ->searchable()
+                        ->preload()
+                        ->multiple()
+                        ->placeholder('Select categories'),
+                    TagFilter::make(),
+                ],
+                default => [
+                    TagFilter::make(),
+                ],
+            },
         };
     }
 
