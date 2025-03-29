@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions;
 
+use App\Actions\GenerateQrCode;
 use App\Models\Response;
 use Filament\Actions\Action;
 use Illuminate\Contracts\Support\Responsable;
@@ -20,8 +21,11 @@ class PreviewResponseAction extends Action
         $this->label('Preview');
 
         $this->action(function (Response $response) {
+            $qr = app(GenerateQrCode::class)((string) url($response->code), 96);
+
             $pdf = Pdf::view('filament.responses.base', [
                 'response' => $response,
+                'qr' => $qr,
             ]);
 
             $pdf->withBrowserShot(fn (Browsershot $browsershot) => $browsershot->noSandbox()->setOption('args', ['--disable-web-security']));
@@ -32,6 +36,7 @@ class PreviewResponseAction extends Action
 
             $pdf->headerView('filament.responses.partials.header', [
                 'response' => $response,
+                'qr' => $qr,
             ]);
 
             $pdf->disk('local');
