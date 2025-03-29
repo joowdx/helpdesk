@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -24,7 +25,7 @@ class HomePanelProvider extends PanelProvider
             ->path('')
             ->homeUrl('/')
             ->brandLogo(fn () => view('banner'))
-            ->font('Urbanist')
+            ->font('Urbanist', provider: GoogleFontProvider::class)
             ->colors([...Color::all(), 'gray' => Color::Neutral])
             ->discoverPages(in: app_path('Filament/Panels/Home/Pages'), for: 'App\\Filament\\Panels\\Home\\Pages')
             ->middleware([

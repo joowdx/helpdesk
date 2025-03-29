@@ -14,6 +14,7 @@ use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\RejectRequestAction;
 use App\Filament\Actions\Tables\ReplyRequestAction;
 use App\Filament\Actions\Tables\RequeueRequestAction;
+use App\Filament\Actions\Tables\RespondRequestAction;
 use App\Filament\Actions\Tables\RestoreRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
@@ -32,6 +33,8 @@ class InquiryResource extends RequestResource
     protected static bool $shouldRegisterNavigation = true;
 
     protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
+
+    protected static ?string $navigationGroup = 'Incoming Requests';
 
     protected static ?string $label = 'Inquiries';
 
@@ -71,6 +74,7 @@ class InquiryResource extends RequestResource
                     AssignRequestAction::make(),
                     RequeueRequestAction::make(),
                     RejectRequestAction::make(),
+                    RespondRequestAction::make(),
                     CompileRequestAction::make(),
                     RecategorizeRequestAction::make(),
                     ReclassifyRequestAction::make(),
@@ -87,6 +91,7 @@ class InquiryResource extends RequestResource
                     CompleteRequestAction::make(),
                     RequeueRequestAction::make(),
                     RejectRequestAction::make(),
+                    RespondRequestAction::make(),
                     CompileRequestAction::make(),
                     RecategorizeRequestAction::make(),
                     ReclassifyRequestAction::make(),

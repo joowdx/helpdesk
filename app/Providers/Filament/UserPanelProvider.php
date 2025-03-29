@@ -8,6 +8,7 @@ use App\Http\Middleware\Approve;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\Initialize;
 use App\Http\Middleware\Verify;
+use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -33,7 +34,7 @@ class UserPanelProvider extends PanelProvider
             ->homeUrl('/')
             ->profile(Profile::class)
             ->brandLogo(fn () => view('banner'))
-            ->font('Urbanist')
+            ->font('Urbanist', provider: GoogleFontProvider::class)
             ->colors([...Color::all(), 'gray' => Color::Neutral])
             ->discoverResources(in: app_path('Filament/Panels/User/Resources'), for: 'App\\Filament\\Panels\\User\\Resources')
             ->discoverPages(in: app_path('Filament/Panels/User/Pages'), for: 'App\\Filament\\Panels\\User\\Pages')

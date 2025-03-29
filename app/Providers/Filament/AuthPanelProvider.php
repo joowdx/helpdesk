@@ -11,6 +11,7 @@ use App\Filament\Panels\Auth\Pages\Login;
 use App\Filament\Panels\Auth\Pages\Redirect;
 use App\Filament\Panels\Auth\Pages\Registration;
 use App\Filament\Panels\Auth\Pages\Verification;
+use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -35,7 +36,7 @@ class AuthPanelProvider extends PanelProvider
             ->path('auth')
             ->homeUrl('/')
             ->brandLogo(fn () => view('banner'))
-            ->font('Urbanist')
+            ->font('Urbanist', provider: GoogleFontProvider::class)
             ->login(Login::class)
             ->registration(Registration::class)
             ->passwordReset()

@@ -7,6 +7,7 @@ use App\Http\Middleware\Active;
 use App\Http\Middleware\Approve;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\Verify;
+use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -32,7 +33,7 @@ class RootPanelProvider extends PanelProvider
             ->homeUrl('/')
             ->profile(Profile::class)
             ->brandLogo(fn () => view('banner'))
-            ->font('Urbanist')
+            ->font('Urbanist', provider: GoogleFontProvider::class)
             ->colors([...Color::all(), 'gray' => Color::Neutral])
             ->discoverPages(in: app_path('Filament/Panels/Root/Pages'), for: 'App\\Filament\\Panels\\Root\\Pages')
             ->discoverWidgets(in: app_path('Filament/Panels/Root/Widgets'), for: 'App\\Filament\\Panels\\Root\\Widgets')
