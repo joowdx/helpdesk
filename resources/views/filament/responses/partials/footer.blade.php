@@ -3,7 +3,7 @@
     <div style="flex: 1; height: 1in; overflow: hidden; font-size: 12pt;">
         <img
             src="data:image/png;base64,{{base64_encode(Storage::disk('public')->get('footer.png'))}}"
-            style="width: auto; height: 1in;"
+            style="width: 100%; height: auto;"
         />
     </div>
 

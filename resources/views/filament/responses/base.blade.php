@@ -8,25 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
 </head>
-<body class="font-serif [&>*:first-child]:mt-0 [&>*:last-child]:mb-0" style="margin:0;padding-top:0.5in;-webkit-print-color-adjust: exact;">
-    <header style="display: inline-flex; height: 1in; width: 100%;">
-
-        <div style="flex: 1; height: 1in; overflow: hidden; font-size: 12pt;">
-            <div style="height: 200px; width: 100%; background-image: linear-gradient(to right, #B31E80, #330263);">
-                hello
-            </div>
-        </div>
-
-        <div style="height: 1in; width: 1in; overflow: hidden; position: relative; flex-shrink: 0; margin-right: 12pt;">
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; font-size: 6pt; color: #D7922A;">
-                ᴠᴇʀɪꜰɪᴄᴀᴛɪᴏɴ
-            </div>
-            {!! $qr !!}
-        </div>
-
-    </header>
-
-
+<body class="font-serif [&>*:first-child]:mt-0 [&>*:last-child]:mb-0" style="margin:0;padding-top:0.5in;-webkit-print-color-adjust:exact;">
     @foreach ($response?->content ?? [] as $content)
         @if (in_array($content['type'], ['heading', 'addressee', 'paragraph', 'greeting', 'markdown', 'signatories']))
             @include('filament.responses.partials.' . $content['type'], ['data' => $content['data']])

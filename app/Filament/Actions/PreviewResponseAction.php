@@ -28,13 +28,24 @@ class PreviewResponseAction extends Action
                 'qr' => $qr,
             ]);
 
-            $pdf->withBrowserShot(fn (Browsershot $browsershot) => $browsershot->noSandbox()->setOption('args', ['--disable-web-security']));
+            $pdf->withBrowserShot(function (Browsershot $browsershot) {
+                $browsershot
+                    ->noSandbox()
+                    ->writeOptionsToFile()
+                    ->waitUntilNetworkIdle()
+                    ->setOption('args', ['--disable-web-security']);
+            });
 
             $pdf->format('A4');
 
             $pdf->margins(1, 1, 1, 1, 'in');
 
             $pdf->headerView('filament.responses.partials.header', [
+                'response' => $response,
+                'qr' => $qr,
+            ]);
+
+            $pdf->footerView('filament.responses.partials.footer', [
                 'response' => $response,
                 'qr' => $qr,
             ]);
