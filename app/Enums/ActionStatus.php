@@ -31,7 +31,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
     case CLOSED = 'closed';
 
     case ON_HOLD = 'on_hold';           // Placeholder only
-    case IN_PROGRESS = 'in_progress';   // Placeholder only
+    case IN_PROGRESS = 'in_progress';
 
     public static function majorActions(): array
     {
@@ -74,6 +74,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::QUEUED => 'info',
             self::COMPLIED => 'success',
             self::CLOSED => 'gray',
+            self::IN_PROGRESS => 'info',
             self::ON_HOLD => 'warning',
             default => 'gray'
         };
