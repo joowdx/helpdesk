@@ -3,7 +3,7 @@
 namespace App\Filament\Clusters\Outbound\Resources;
 
 use App\Enums\RequestClass;
-use App\Filament\Actions\Tables\ShowRequestAction;
+use App\Filament\Actions\Tables\ViewRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Outbound;
 use App\Filament\Clusters\Outbound\Resources\RequestResource\Pages\ListTickets;
@@ -37,7 +37,7 @@ class TicketResource extends RequestResource
     public static function tableActions(): array
     {
         return [
-            ShowRequestAction::make(),
+            ViewRequestAction::make(),
             ViewRequestHistoryAction::make(),
         ];
     }
