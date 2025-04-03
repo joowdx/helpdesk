@@ -16,6 +16,7 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +40,16 @@ abstract class RequestResource extends Resource
         $panel = Filament::getCurrentPanel()->getId();
 
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->with(['user', 'organization', 'action', 'actions', 'tags', 'category', 'subcategory']))
+            ->modifyQueryUsing(fn (Builder $query) => $query->with([
+                'user',
+                'organization',
+                'action',
+                'actions',
+                'tags',
+                'category',
+                'subcategory',
+                'submission',
+            ]))
             ->columns([
                 TextColumn::make('action.status')
                     ->searchable(['code'])
@@ -56,14 +66,16 @@ abstract class RequestResource extends Resource
                         };
                     }),
                 TextColumn::make('subject')
-                    ->sortable()
                     ->searchable()
                     ->limit(24)
                     ->wrap()
-                    ->tooltip(fn ($column) => strlen($column->getState()) > $column->getCharacterLimit() ? $column->getState() : null),
+                    ->tooltip(fn ($column) => strlen($column->getState()) > $column->getCharacterLimit() ? $column->getState() : null)
+                    ->description(fn (Request $request) => $request->submission?->created_at->format('jS F H:i'), 'above'),
                 TextColumn::make('user.name')
+                    ->searchable(['name', 'email'])
                     ->description(fn (Request $request) => $request->from?->code)
-                    ->hidden(static::$inbound === null),
+                    ->hidden(static::$inbound === null)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('organization.code')
                     ->sortable()
                     ->searchable()
@@ -72,7 +84,12 @@ abstract class RequestResource extends Resource
                     ->tooltip(fn (Request $request) => $request->organization->name)
                     ->visible(in_array($panel, ['root']) || static::$inbound === null),
                 TextColumn::make('category.name')
-                    ->description(fn (Request $request) => $request->subcategory->name),
+                    ->description(fn (Request $request, $column) => str($request->subcategory->name)->limit($column->getCharacterLimit()))
+                    ->tooltip(fn (Request $request, $column) => max(strlen($column->getState()), strlen($request->subcategory->name)) > $column->getCharacterLimit()
+                        ? "{$column->getState()} — {$request->subcategory->name}"
+                        : null
+                    )
+                    ->limit(24),
                 TextColumn::make('assignees.name')
                     ->searchable(['name', 'email'])
                     ->bulleted()
@@ -84,16 +101,10 @@ abstract class RequestResource extends Resource
                     ->alignEnd()
                     ->toggleable()
                     ->color(fn (Request $request, string $state) => $request->tags->first(fn ($tag) => $tag->name === $state)?->color ?? 'gray'),
-                TextColumn::make('created_at')
-                    ->since()
-                    ->dateTimeTooltip()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters(static::tableFilters())
             ->actions(static::tableActions())
             ->bulkActions(static::tableBulkActions())
-            ->recordAction(null)
             ->defaultSort(
                 fn (Builder $query) => $query->orderBy(
                     Action::query()
@@ -104,6 +115,27 @@ abstract class RequestResource extends Resource
                         ->limit(1),
                     'desc'
                 ),
+            )
+            ->defaultGroup(
+                Group::make('date')
+                    ->getKeyFromRecordUsing(
+                        fn (Request $record): string => $record->created_at->format('Y-m-0')
+                    )
+                    ->getTitleFromRecordUsing(
+                        fn (Request $record): string => $record->created_at->format('F Y')
+                    )
+                    ->orderQueryUsing(
+                        fn (Builder $query) => $query->orderBy(
+                            Action::query()
+                                ->select('id')
+                                ->whereColumn('actions.request_id', 'requests.id')
+                                ->where('status', ActionStatus::SUBMITTED)
+                                ->latest()
+                                ->limit(1),
+                            'desc'
+                        )
+                    )
+                    ->titlePrefixedWithLabel(false),
             );
     }
 
