@@ -105,6 +105,8 @@ abstract class RequestResource extends Resource
             ->filters(static::tableFilters())
             ->actions(static::tableActions())
             ->bulkActions(static::tableBulkActions())
+            ->paginationPageOptions([5, 10, 15, 20, 25])
+            ->defaultPaginationPageOption(10)
             ->defaultSort(
                 fn (Builder $query) => $query->orderBy(
                     Action::query()
