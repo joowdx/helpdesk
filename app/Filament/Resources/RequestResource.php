@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Filament\Clusters\Requests;
+use App\Filament\Filters\AssigneeFilter;
 use App\Filament\Filters\OrganizationFilter;
 use App\Filament\Filters\TagFilter;
 use App\Models\Action;
@@ -160,6 +161,7 @@ abstract class RequestResource extends Resource
             ],
             default => match (static::$inbound) {
                 true => [
+                    AssigneeFilter::make(),
                     SelectFilter::make('categories')
                         ->relationship(
                             'subcategory',
