@@ -8,7 +8,7 @@ use App\Filament\Actions\Tables\CompileRequestAction;
 use App\Filament\Actions\Tables\RecallRequestAction;
 use App\Filament\Actions\Tables\ReopenRequestAction;
 use App\Filament\Actions\Tables\ResubmitRequestAction;
-use App\Filament\Actions\Tables\ShowRequestAction;
+use App\Filament\Actions\Tables\ViewRequestAction;
 use App\Filament\Actions\Tables\UndoRecentAction;
 use App\Filament\Actions\Tables\UpdateRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
@@ -44,7 +44,7 @@ class SuggestionResource extends RequestResource
     {
         return [
             ResubmitRequestAction::make(),
-            ShowRequestAction::make(),
+            ViewRequestAction::make(),
             ViewRequestHistoryAction::make(),
             ActionGroup::make([
                 UndoRecentAction::make(),
