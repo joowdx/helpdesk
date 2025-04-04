@@ -42,36 +42,28 @@ trait ViewRequest
         $this->modalWidth(MaxWidth::ExtraLarge);
 
         $this->infolist(fn (Request $request) => [
+            TextEntry::make('tags')
+                ->hiddenLabel()
+                ->badge()
+                ->alignEnd()
+                ->hidden($request->tags->isEmpty())
+                ->color(fn (string $state) => $request->tags->first(fn ($tag) => $tag->name === $state)?->color ?? 'gray')
+                ->state($request->tags->pluck('name')->toArray()),
+            TextEntry::make('from.name')
+                ->hiddenLabel()
+                ->helperText("{$request->submission?->created_at->format('jS \of F \a\t H:i')}"),
+            TextEntry::make('action.status')
+                ->hiddenLabel()
+                ->state($request->action->status === ActionStatus::CLOSED ? $request->action->resolution : $request->action->status),
+            TextEntry::make('subject')
+                ->hiddenLabel()
+                ->weight(FontWeight::Bold),
             Tabs::make()
                 ->contained(false)
                 ->tabs([
-                    Tab::make('Information')
+                    Tab::make($request->class === RequestClass::INQUIRY ? 'Replies' : 'Content')
                         ->schema([
-                            TextEntry::make('tags')
-                                ->hiddenLabel()
-                                ->badge()
-                                ->alignEnd()
-                                ->hidden($request->tags->isEmpty())
-                                ->color(fn (string $state) => $request->tags->first(fn ($tag) => $tag->name === $state)?->color ?? 'gray')
-                                ->state($request->tags->pluck('name')->toArray()),
-                            TextEntry::make('from.name')
-                                ->hiddenLabel()
-                                ->helperText("{$request->user->name} on {$request->submission?->created_at->format('jS \of F \a\t H:i')}"),
-                            TextEntry::make('action.status')
-                                ->hiddenLabel()
-                                ->size(TextEntry\TextEntrySize::ExtraSmall)
-                                ->state($request->action->status === ActionStatus::CLOSED ? $request->action->resolution : $request->action->status),
-                            TextEntry::make('subject')
-                                ->hiddenLabel()
-                                ->weight(FontWeight::Bold)
-                                ->size(TextEntry\TextEntrySize::Large),
-                            TextEntry::make('submitted.created_at')
-                                ->hiddenLabel()
-                                ->color('gray')
-                                ->dateTime('F j, Y \a\t H:i'),
                             ViewEntry::make('body')
-                                ->label('Inquiry')
-                                ->hiddenLabel(false)
                                 ->view('filament.requests.show', [
                                     'request' => $request,
                                 ]),
