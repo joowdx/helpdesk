@@ -70,7 +70,7 @@ abstract class RequestResource extends Resource
                     ->limit(24)
                     ->wrap()
                     ->tooltip(fn ($column) => strlen($column->getState()) > $column->getCharacterLimit() ? $column->getState() : null)
-                    ->description(fn (Request $request) => $request->submission?->created_at->format('jS F H:i'), 'above'),
+                    ->description(fn (Request $request) => $request->submission?->created_at->format('jS \o\f F \a\t H:i'), 'above'),
                 TextColumn::make('user.name')
                     ->searchable(['name', 'email'])
                     ->description(fn (Request $request) => $request->from?->code)
@@ -93,8 +93,7 @@ abstract class RequestResource extends Resource
                 TextColumn::make('assignees.name')
                     ->searchable(['name', 'email'])
                     ->bulleted()
-                    ->limitList(1)
-                    ->expandableLimitedList(),
+                    ->limitList(2),
                 TextColumn::make('tags.name')
                     ->badge()
                     ->wrap()
