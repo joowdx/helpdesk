@@ -365,6 +365,23 @@
                                 <img alt="arnel" src="{{ asset('assets/developers/arnel.jpg') }}" class="rounded-full" loading="lazy" width="120" height="120">
                             </a>
                         </div>
+
+                        <div class="mt-16 text-center text-sm text-gray-600 dark:text-gray-400">
+                            This project wouldn’t be the same without the support of our interns: <br>
+
+                            <span class="font-bold">
+                                <a href="https://github.com/llAlcatrazll" target="_blank" class="hover:underline text-gray-700 dark:text-gray-300">
+                                    Alexis Alcatraz
+                                </a> &amp;
+                                <a href="https://github.com/MrckJd" target="_blank" class="hover:underline text-gray-700 dark:text-gray-300">
+                                    Marck Jude Dura
+                                </a>
+                            </span>
+
+                            <p class="mt-2 text-xs text-gray-500 italic">
+                                *The app's foundation was built on their initial prototype work.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
