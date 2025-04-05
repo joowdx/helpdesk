@@ -93,8 +93,8 @@ class SuspendRequestAction extends Action
                 return false;
             }
 
-            return in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::COMPLIED]) && match ($request->class) {
-                RequestClass::TICKET => $request->assignees->contains(Auth::user()),
+            return in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::ASSIGNED, ActionStatus::COMPLIED]) && match ($request->class) {
+                RequestClass::TICKET => $request->assignees->contains(Auth::user()) || Auth::user()->admin,
                 default => false,
             };
         });
