@@ -13,7 +13,6 @@ use App\Filament\Actions\Tables\ResubmitRequestAction;
 use App\Filament\Actions\Tables\UndoRecentAction;
 use App\Filament\Actions\Tables\UpdateRequestAction;
 use App\Filament\Actions\Tables\ViewRequestAction;
-use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Personal;
 use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\ListInquiries;
 use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\NewInquiry;
@@ -49,7 +48,6 @@ class InquiryResource extends RequestResource
             ResubmitRequestAction::make(),
             ResolveRequestAction::make(),
             ViewRequestAction::make(),
-            ViewRequestHistoryAction::make(),
             ActionGroup::make([
                 UndoRecentAction::make(),
                 ReopenRequestAction::make(),

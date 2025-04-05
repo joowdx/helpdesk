@@ -4,7 +4,6 @@ namespace App\Filament\Clusters\Outbound\Resources;
 
 use App\Enums\RequestClass;
 use App\Filament\Actions\Tables\ViewRequestAction;
-use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Outbound;
 use App\Filament\Clusters\Outbound\Resources\RequestResource\Pages\ListSuggestions;
 use App\Filament\Clusters\Outbound\Resources\RequestResource\Pages\NewSuggestion;
@@ -36,7 +35,6 @@ class SuggestionResource extends RequestResource
     {
         return [
             ViewRequestAction::make(),
-            ViewRequestHistoryAction::make(),
         ];
     }
 }
