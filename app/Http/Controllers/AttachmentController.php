@@ -39,6 +39,7 @@ class AttachmentController extends Controller implements HasMiddleware
                 Auth::id() === $attachment->attachable->request->user_id,
             'App\Models\Note' => in_array(Auth::user()->organization_id, [$attachment->attachable->notable->organization_id]) ||
                 Auth::id() === $attachment->attachable->notable->user_id,
+            'App\Models\Response' => true,
             default => false,
         };
 
