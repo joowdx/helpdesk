@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Navigation\NavigationGroup;
 use Filament\Notifications\Livewire\Notifications;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\MaxWidth;
@@ -50,6 +52,17 @@ class AppServiceProvider extends ServiceProvider
 
     protected function configureFilament(): void
     {
+        Filament::serving(function () {
+            Filament::registerNavigationGroups([
+                NavigationGroup::make('incoming')
+                    ->icon('heroicon-o-lifebuoy'),
+                NavigationGroup::make('responses')
+                    ->icon('heroicon-o-paper-airplane'),
+                NavigationGroup::make('dossiers')
+                    ->icon('heroicon-o-rectangle-group'),
+            ]);
+        });
+
         FilamentView::registerRenderHook(PanelsRenderHook::HEAD_START, fn () => Blade::render('@vite(\'resources/css/app.css\')'));
 
         FilamentView::registerRenderHook(PanelsRenderHook::TOPBAR_START, fn () => Blade::render('<div class="flex items-center w-full h-16 px-4 mx-auto md:px-6 lg:px-8 gap-x-4 max-w-[1920px] 2xl:px-8">'));
