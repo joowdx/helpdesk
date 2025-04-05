@@ -74,7 +74,7 @@ class StartRequestAction extends Action
                 ActionStatus::ASSIGNED,
                 ActionStatus::REINSTATED,
                 ActionStatus::COMPLIED,
-                ActionStatus::REOPENED
+                ActionStatus::REOPENED,
             ]) && match ($request->class) {
                 RequestClass::TICKET => $request->assignees->contains(Auth::user()),
                 default => false,
