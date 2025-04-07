@@ -15,7 +15,7 @@ class Response extends Model
 
     protected $fillable = [
         'code',
-        'addressee',
+        'file',
         'content',
         'options',
         'hash',
