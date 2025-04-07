@@ -18,10 +18,10 @@ return new class extends Migration
             $table->json('addressee')->nullable();
             $table->json('content');
             $table->json('options');
-            $table->string('disposition')->default('');
             $table->char('hash', 64)->nullable();
             $table->foreignUlid('request_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignUlid('user_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
+            $table->foreignUlid('document_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
             $table->timestamp('submitted_at')->nullable();
             $table->timestamps();
         });
