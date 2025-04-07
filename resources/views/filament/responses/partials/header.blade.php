@@ -1,5 +1,7 @@
 @php($organization = Auth::user()->organization)
 
+@php($final ??= false)
+
 <header @style([
     '-webkit-print-color-adjust: exact',
     'display: inline-flex',
@@ -72,12 +74,16 @@
             'color: #D7922A',
             'border-radius: 5pt',
         ])>
-            &nbsp;ᴠᴇʀɪꜰɪᴄᴀᴛɪᴏɴ&nbsp;
+            @if ($final)
+                &nbsp;ᴠᴇʀɪꜰɪᴄᴀᴛɪᴏɴ&nbsp;
+            @else
+                &nbsp;ᴅʀᴀғᴛ&nbsp;ᴏɴʟʏ&nbsp;
+            @endif
         </label>
         {!! $qr !!}
     </div>
 
-    @if (! ($final ?? true))
+    @if (!$final)
         <div class="watermark">DRAFT</div>
     @endif
 </header>

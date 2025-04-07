@@ -1,5 +1,7 @@
 @php($organization = Auth::user()->organization)
 
+@php($final ??= false)
+
 <footer @style([
     '-webkit-print-color-adjust: exact',
     'display: inline-flex',
@@ -28,12 +30,14 @@
         </div>
     @endif
 
-    <div style="font-size: 8pt; color: #B0B0B0; text-align: right; font-family: 'Liberation Sans';">
-        <div style="padding: 0 0.25in;">
-            To verify the authenticity of this document, please visit:
-            <a style="font-family: 'DejaVu Sans Mono'; font-size: 7pt; font-style: italic; text-decoration: underline; letter-spacing: -0.125em;">
-                {{ $url }}
-            </a>
+    @if ($final)
+        <div style="font-size: 8pt; color: #B0B0B0; text-align: right; font-family: 'Liberation Sans';">
+            <div style="padding: 0 0.25in;">
+                To verify the authenticity of this document, please visit:
+                <a style="font-family: 'DejaVu Sans Mono'; font-size: 7pt; font-style: italic; text-decoration: underline; letter-spacing: -0.125em;">
+                    {{ $url }}
+                </a>
+            </div>
         </div>
-    </div>
+    @endif
 </footer>
