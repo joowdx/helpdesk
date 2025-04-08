@@ -92,6 +92,12 @@ class Request extends Model
             ->ofMany(['id' => 'max'], fn ($query) => $query->where('status', ActionStatus::SUBMITTED));
     }
 
+    public function completion(): HasOne
+    {
+        return $this->hasOne(Action::class)
+            ->ofMany(['id' => 'max'], fn ($query) => $query->where('status', ActionStatus::COMPLETED));
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
