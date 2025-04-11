@@ -93,7 +93,14 @@ abstract class RequestResource extends Resource
                 TextColumn::make('assignees.name')
                     ->searchable(['name', 'email'])
                     ->bulleted()
-                    ->limitList(2),
+                    ->limitList(2)
+                    ->description(function (Request $request) {
+                        if (is_null($request->completion)) {
+                            return null;
+                        }
+
+                        return "{$request->completion?->created_at->format('jS \o\f F \a\t H:i')}";
+                    }, 'above'),
                 TextColumn::make('tags.name')
                     ->badge()
                     ->wrap()
