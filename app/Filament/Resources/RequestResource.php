@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\ActionResolution;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Filament\Clusters\Requests;
@@ -40,22 +41,48 @@ abstract class RequestResource extends Resource
         $panel = Filament::getCurrentPanel()->getId();
 
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->with([
-                'user',
-                'organization',
-                'action',
-                'actions',
-                'tags',
-                'category',
-                'subcategory',
-                'submission',
-            ]))
             ->columns([
                 TextColumn::make('action.status')
                     ->searchable(['code'])
                     ->label('Status')
                     ->badge()
-                    ->description(fn (Request $request) => "#{$request->code}")
+                    ->description(function (Request $request) {
+                        $action = match($request->class) {
+                            RequestClass::SUGGESTION => match ($request->action->status) {
+                                ActionStatus::CLOSED => match ($request->action->resolution) {
+                                    default => $request->action,
+                                },
+                                default => null,
+                            },
+                            default => match ($request->action->status) {
+                                ActionStatus::COMPLETED,
+                                ActionStatus::SUSPENDED,
+                                ActionStatus::REOPENED,
+                                ActionStatus::REINSTATED => $request->action,
+                                ActionStatus::CLOSED => match ($request->action->resolution) {
+                                    ActionResolution::RESOLVED => $request->completion,
+                                    default => $request->action,
+                                },
+                                default => null,
+                            },
+                        };
+
+                        $color = $action?->status === ActionStatus::CLOSED ? $action->resolution->getColor() : $action?->status->getColor();
+
+                        $latest = $action ?  $action->created_at->format('jS M H:i') : null;
+
+                        $style = $action ? "--c-400:var(--{$color}-400);--c-600:var(--{$color}-600);" : null;
+
+                        $html = <<<HTML
+                            <div class="flex flex-col">
+                                <span class="text-xs text-custom-600 dark:text-custom-400" style="{$style}"> $latest </span>
+
+                                <span class="font-mono text-sm"> #{$request->code} </span>
+                            </div>
+                        HTML;
+
+                        return str($html)->toHtmlString();
+                    })
                     ->state(function (Request $request) {
                         return match ($request->action?->status) {
                             ActionStatus::CLOSED => $request->action?->resolution,
@@ -66,11 +93,24 @@ abstract class RequestResource extends Resource
                         };
                     }),
                 TextColumn::make('subject')
+                    ->label('Request')
                     ->searchable()
                     ->limit(24)
                     ->wrap()
                     ->tooltip(fn ($column) => strlen($column->getState()) > $column->getCharacterLimit() ? $column->getState() : null)
-                    ->description(fn (Request $request) => $request->submission?->created_at->format('jS \o\f F \a\t H:i'), 'above'),
+                    ->description(function (Request $request) {
+                        $submission = $request->submission
+                            ? $request->submission->created_at->format('jS M H:i')
+                            : null;
+
+                        $html = <<<HTML
+                            <span class="text-xs text-gray-600 dark:text-gray-400">
+                                {$submission}
+                            </span>
+                        HTML;
+
+                        return str($html)->toHtmlString();
+                    }, 'above'),
                 TextColumn::make('user.name')
                     ->searchable(['name', 'email'])
                     ->description(fn (Request $request) => $request->from?->code)
@@ -93,14 +133,7 @@ abstract class RequestResource extends Resource
                 TextColumn::make('assignees.name')
                     ->searchable(['name', 'email'])
                     ->bulleted()
-                    ->limitList(2)
-                    ->description(function (Request $request) {
-                        if (is_null($request->completion)) {
-                            return null;
-                        }
-
-                        return "{$request->completion?->created_at->format('jS \o\f F \a\t H:i')}";
-                    }, 'above'),
+                    ->limitList(2),
                 TextColumn::make('tags.name')
                     ->badge()
                     ->wrap()
