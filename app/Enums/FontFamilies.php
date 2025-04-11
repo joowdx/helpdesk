@@ -21,7 +21,6 @@ enum FontFamilies: string implements HasLabel
     case PlayfairDisplay = 'Playfair Display';
     case Cardo = 'Cardo';
 
-
     public function getLabel(): string
     {
         return $this->value;

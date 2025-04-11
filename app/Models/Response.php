@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Response extends Model
@@ -20,15 +21,16 @@ class Response extends Model
         'options',
         'hash',
         'submitted',
-        'request_id',
         'user_id',
-        'submitted_at',
+        'action_id',
+        'document_id',
+        'issued_at',
     ];
 
     protected $casts = [
         'content' => 'array',
         'options' => 'array',
-        'submitted_at' => 'datetime',
+        'issued_at' => 'datetime',
     ];
 
     public static function booted(): void
@@ -75,9 +77,9 @@ class Response extends Model
             ->withTimestamps();
     }
 
-    public function request(): BelongsTo
+    public function action(): BelongsTo
     {
-        return $this->belongsTo(Request::class);
+        return $this->belongsTo(Action::class);
     }
 
     public function document(): BelongsTo

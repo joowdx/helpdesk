@@ -11,7 +11,7 @@ class Document extends Model
 
     protected $fillable = [
         'name',
-        'disposition',
+        'description',
         'content',
         'options',
     ];

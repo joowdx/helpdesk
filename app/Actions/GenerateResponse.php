@@ -11,7 +11,7 @@ class GenerateResponse
 {
     public function __invoke(Response $response, string $path, bool $preview = false): void
     {
-        $url = config('app.url') . '/verification/' . $response->code;
+        $url = config('app.url').'/verification/'.$response->code;
 
         $qr = (new GenerateQrCode)('this is for drafting purposes only', 96);
 
@@ -23,7 +23,7 @@ class GenerateResponse
         $pdf->headerView('filament.responses.partials.header', [
             'response' => $response,
             'qr' => $qr,
-            'final' => !(bool) $preview,
+            'final' => ! (bool) $preview,
         ]);
 
         $pdf->footerView('filament.responses.partials.footer', [
