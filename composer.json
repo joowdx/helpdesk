@@ -18,6 +18,7 @@
         "lsnepomuceno/laravel-a1-pdf-sign": "^1.4",
         "mailersend/laravel-driver": "^2.9",
         "resend/resend-php": "^0.16.0",
+        "spatie/laravel-pdf": "^1.5",
         "sunspikes/clamav-validator": "^1.6",
         "symfony/http-client": "^7.2",
         "symfony/mailgun-mailer": "^7.2",
