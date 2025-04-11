@@ -81,13 +81,23 @@
 
 
         @if ($action->status === ActionStatus::RESPONDED)
-            <iframe
-                class="rounded-lg"
-                src="{{ Storage::disk('local')->url($action->response?->attachment->files->first()) }}"
-                style="width: 100%; height: 100%; border: none;"
-                allowfullscreen
-                allow="fullscreen"
-            ></iframe>
+            <div class="space-y-2">
+                @include('filament.attachments.show', ['attachment' => $action->response?->attachment])
+
+                @if ($action->response && Storage::disk('local')->exists($action->response?->attachment?->files->first()))
+                    <iframe
+                        class="rounded-lg"
+                        src="{{ route('file.attachment', [
+                            'attachment' => $action->response?->attachment?->id,
+                            'name' => $action->response?->attachment?->paths->first(),
+                            'preview' => 1,
+                        ]) }}#view=fitH&toolbar=1"
+                        style="width: 100%; height: 6in; border: none;"
+                        allowfullscreen
+                        allow="fullscreen"
+                    ></iframe>
+                @endif
+            </div>
         @endif
 
         @if ($action->attachment?->paths->isNotEmpty())

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attachment;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -28,7 +29,7 @@ class AttachmentController extends Controller implements HasMiddleware
     /**
      * Handle the incoming file attachment download request.
      */
-    public function __invoke(Attachment $attachment, string $name)
+    public function __invoke(Request $request, Attachment $attachment, string $name)
     {
         abort_unless($attachment->paths->contains($name) && Storage::exists($attachment->paths->search($name)), 404);
 
@@ -45,6 +46,8 @@ class AttachmentController extends Controller implements HasMiddleware
 
         abort_unless($allowed, 403);
 
-        return Storage::download($attachment->paths->search($name), $name);
+        return filter_var($request->input('preview') ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)
+            ? Storage::response($attachment->paths->search($name), $name)
+            : Storage::download($attachment->paths->search($name), $name);
     }
 }
