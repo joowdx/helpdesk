@@ -28,6 +28,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
     case RECLASSIFIED = 'reclassified';
     case RECATEGORIZED = 'recategorized';
     case REPLIED = 'replied';
+    case RESPONDED = 'responded';
     case TAGGED = 'tagged';
     case CLOSED = 'closed';
 
@@ -128,6 +129,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::REOPENED => 'gmdi-replay-o',
             self::TAGGED => 'gmdi-sell-o',
             self::REPLIED => 'gmdi-chat-o',
+            self::RESPONDED => 'gmdi-history-edu-o',
             self::IN_PROGRESS => 'gmdi-sync-o',
             self::ON_HOLD => 'gmdi-pause-o',
             default => 'gmdi-circle-o',

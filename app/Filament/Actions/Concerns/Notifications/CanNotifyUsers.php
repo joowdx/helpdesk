@@ -4,9 +4,12 @@ namespace App\Filament\Actions\Concerns\Notifications;
 
 use App\Enums\ActionResolution;
 use App\Enums\ActionStatus;
+use App\Models\Attachment;
 use App\Models\Request;
+use App\Models\Response;
 use App\Models\User;
 use Filament\Actions\Concerns\CanCustomizeProcess;
+use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Auth\Authenticatable;
 use ReflectionClass;
@@ -19,7 +22,7 @@ trait CanNotifyUsers
 {
     use CanCustomizeProcess;
 
-    protected function notifyUsers(?Request $request = null)
+    protected function notifyUsers(?Request $request = null, array $input = [])
     {
         $reflection = new ReflectionClass($this);
 
@@ -27,16 +30,19 @@ trait CanNotifyUsers
             return;
         }
 
-        $notify = function (User $user, string $heading, ?string $description, ?string $icon, ?string $color) {
+        $notify = function (User $user, string $heading, ?string $description, ?string $icon, ?string $color, array $actions = []) {
             Notification::make()
                 ->title($heading)
                 ->body($description)
                 ->color($color)
                 ->icon($icon)
+                ->actions($actions)
                 ->sendToDatabase($user, true);
         };
 
-        $this->process(function (?Request $record, Authenticatable $authenticated, array $data = []) use ($notify, $request) {
+        $this->process(function (?Request $record, Authenticatable $authenticated, array $data = []) use ($notify, $request, $input) {
+            $input = empty($input) ? $data : $input;
+
             $request ??= $record;
 
             $heading = match (static::$requestAction) {
@@ -47,8 +53,9 @@ trait CanNotifyUsers
                 ActionStatus::COMPLIED => "{$request->class->getLabel()} request #{$request->code} complied",
                 ActionStatus::COMPLETED => "{$request->class->getLabel()} request #{$request->code} completed",
                 ActionStatus::REJECTED => "{$request->class->getLabel()} request assignment rejected",
-                ActionStatus::REPLIED => "$authenticated->name has replied to ".($authenticated->id !== $request->user_id ? 'your' : 'their')." inquiry #{$request->code}.",
+                ActionStatus::REPLIED => "$authenticated->name has replied to ".($authenticated->id !== $request->user_id ? 'your' : 'their')." inquiry #{$request->code}",
                 ActionStatus::REINSTATED => "{$request->class->getLabel()} request #{$request->code} reinstated",
+                ActionStatus::RESPONDED => "An official response was issued to your {$request->class->value} request #{$request->code}",
                 ActionStatus::CLOSED => "Request #{$request->code} has been closed",
                 default => null,
             };
@@ -66,7 +73,7 @@ trait CanNotifyUsers
                 ActionStatus::REINSTATED => "{$authenticated->name} has reinstated the request after suspension.",
                 ActionStatus::COMPLETED => "The request has been completed successfully by {$authenticated->name}.",
                 ActionStatus::REJECTED => "The assignment has been rejected by {$authenticated->name} for {$request->class->value} request #{$request->code}.",
-                ActionStatus::CLOSED => match (static::$requestResolution ?? ActionResolution::tryFrom($data['resolution'])) {
+                ActionStatus::CLOSED => match (static::$requestResolution ?? ActionResolution::tryFrom($input['resolution'])) {
                     ActionResolution::RESOLVED => "The request has been successfully resolved by {$authenticated->name}.",
                     ActionResolution::UNRESOLVED => "The request has been closed by {$authenticated->name} without resolution provided.",
                     ActionResolution::INVALIDATED => "The request has been found invalid by {$authenticated->name}.",
@@ -81,17 +88,25 @@ trait CanNotifyUsers
                 ActionStatus::SUBMITTED => 'gmdi-move-to-inbox-o',
                 ActionStatus::STARTED => ActionStatus::IN_PROGRESS->getIcon(),
                 ActionStatus::SUSPENDED => ActionStatus::ON_HOLD->getIcon(),
-                ActionStatus::CLOSED => (static::$requestResolution ?? ActionResolution::tryFrom($data['resolution']))->getIcon(),
+                ActionStatus::CLOSED => (static::$requestResolution ?? ActionResolution::tryFrom($input['resolution']))->getIcon(),
                 default => static::$requestAction->getIcon(),
             };
 
             $color = match (static::$requestAction) {
-                ActionStatus::CLOSED => (static::$requestResolution ?? ActionResolution::tryFrom($data['resolution']))->getColor(),
+                ActionStatus::CLOSED => (static::$requestResolution ?? ActionResolution::tryFrom($input['resolution']))->getColor(),
                 default => static::$requestAction->getColor(),
             };
 
+            $actions = match (static::$requestAction) {
+                ActionStatus::RESPONDED => [
+                    Action::make('download')
+                        ->url(route('file.attachment', [($attachment = Attachment::find($input['attachment']))->id, $attachment->paths->first()])),
+                ],
+                default => [],
+            };
+
             $users = match (static::$requestAction) {
-                ActionStatus::ASSIGNED => User::find($data['assignees']),
+                ActionStatus::ASSIGNED => User::find($input['assignees']),
                 ActionStatus::SUBMITTED,
                 ActionStatus::REJECTED => User::where('organization_id', $request->organization_id)->moderator(admin: true)->get(),
                 default => $request->user->is($authenticated) ?
@@ -99,7 +114,7 @@ trait CanNotifyUsers
                     User::find([$request->user_id]),
             };
 
-            $users->each(fn ($user) => $notify($user, $heading, $description, $icon, $color));
+            $users->each(fn ($user) => $notify($user, $heading, $description, $icon, $color, $actions));
         });
     }
 }

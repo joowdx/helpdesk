@@ -36,39 +36,92 @@ class OrganizationResource extends Resource
         return $form
             ->columns(3)
             ->schema([
-                Forms\Components\FileUpload::make('logo')
-                    ->avatar()
-                    ->alignCenter()
-                    ->directory('logos'),
-                Forms\Components\Group::make()
-                    ->columnSpan([
-                        'md' => 2,
-                    ])
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->autofocus()
-                            ->unique(ignoreRecord: true)
-                            ->markAsRequired()
-                            ->rule('required'),
-                        Forms\Components\TextInput::make('code')
-                            ->unique(ignoreRecord: true)
-                            ->markAsRequired()
-                            ->rule('required'),
+                Forms\Components\Tabs::make()
+                    ->contained(false)
+                    ->columns(3)
+                    ->tabs([
+                        Forms\Components\Tabs\Tab::make('Organization')
+                            ->icon('gmdi-domain-o')
+                            ->schema([
+                                Forms\Components\FileUpload::make('logo')
+                                    ->avatar()
+                                    ->alignCenter()
+                                    ->directory('logos'),
+                                Forms\Components\Group::make()
+                                    ->columnSpan([
+                                        'md' => 2,
+                                    ])
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name')
+                                            ->unique(ignoreRecord: true)
+                                            ->markAsRequired()
+                                            ->rule('required'),
+                                        Forms\Components\TextInput::make('code')
+                                            ->markAsRequired()
+                                            ->rule('required')
+                                            ->unique(ignoreRecord: true),
+                                    ]),
+                                Forms\Components\TextInput::make('address')
+                                    ->maxLength(255)
+                                    ->columnSpan([
+                                        'sm' => 1,
+                                        'md' => 3,
+                                    ]),
+                                Forms\Components\TextInput::make('building')
+                                    ->maxLength(255)
+                                    ->columnSpan([
+                                        'sm' => 1,
+                                        'md' => 2,
+                                    ]),
+                                Forms\Components\TextInput::make('room')
+                                    ->columnSpan(1),
+                            ]),
+                        Forms\Components\Tabs\Tab::make('Configuration')
+                            ->icon('gmdi-build-circle-o')
+                            ->schema([
+                                Forms\Components\TextInput::make('settings.auto_queue')
+                                    ->label('Request auto queue')
+                                    ->placeholder('Number of minutes')
+                                    ->helperText('Number of minutes to auto queue a request')
+                                    ->rules(['numeric']),
+                                Forms\Components\TextInput::make('settings.auto_resolve')
+                                    ->label('Request auto resolve')
+                                    ->placeholder('Number of hours')
+                                    ->helperText('Number of hours to auto resolve a completed request')
+                                    ->minValue(48)
+                                    ->rules(['numeric']),
+                                // Forms\Components\TextInput::make('settings.auto_assign')
+                                //     ->label('Request auto assign')
+                                //     ->placeholder('Number of minutes')
+                                //     ->helperText('Number of minutes to auto assign a request')
+                                //     ->rules(['numeric']),
+                            ]),
+                        Forms\Components\Tabs\Tab::make('Documents')
+                            ->icon('gmdi-attach-file-o')
+                            ->schema([
+                                Forms\Components\Section::make('Header')
+                                    ->description('Header image for the official response documents')
+                                    ->schema([
+                                        Forms\Components\FileUpload::make('settings.header')
+                                            ->acceptedFileTypes(['image/*'])
+                                            ->directory('headers'),
+                                    ]),
+                                Forms\Components\Section::make('Footer')
+                                    ->description('Footer image for the official response documents')
+                                    ->schema([
+                                        Forms\Components\FileUpload::make('settings.footer')
+                                            ->acceptedFileTypes(['image/*'])
+                                            ->directory('footers'),
+                                        Forms\Components\Select::make('settings.footer_alignment')
+                                            ->label('Alignment')
+                                            ->options([
+                                                'left' => 'Left',
+                                                'center' => 'Center',
+                                                'right' => 'Right',
+                                            ]),
+                                    ]),
+                            ]),
                     ]),
-                Forms\Components\TextInput::make('address')
-                    ->maxLength(255)
-                    ->columnSpan([
-                        'sm' => 1,
-                        'md' => 3,
-                    ]),
-                Forms\Components\TextInput::make('building')
-                    ->maxLength(255)
-                    ->columnSpan([
-                        'sm' => 1,
-                        'md' => 2,
-                    ]),
-                Forms\Components\TextInput::make('room')
-                    ->columnSpan(1),
             ]);
     }
 
