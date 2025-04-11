@@ -30,6 +30,8 @@ class SuggestionResource extends RequestResource
 
     protected static ?string $navigationIcon = 'heroicon-o-light-bulb';
 
+    protected static ?string $navigationGroup = 'Inbound';
+
     protected static ?string $label = 'Suggestions';
 
     public static function getPages(): array
