@@ -41,16 +41,6 @@ abstract class RequestResource extends Resource
         $panel = Filament::getCurrentPanel()->getId();
 
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->with([
-                'user',
-                'organization',
-                'action',
-                'actions',
-                'tags',
-                'category',
-                'subcategory',
-                'submission',
-            ]))
             ->columns([
                 TextColumn::make('action.status')
                     ->searchable(['code'])
