@@ -371,7 +371,7 @@
 
                             <span class="font-bold">
                                 <a href="https://github.com/llAlcatrazll" target="_blank" class="hover:underline text-gray-700 dark:text-gray-300">
-                                    Alexis Alcatraz
+                                    Alexis Magaway
                                 </a> &amp;
                                 <a href="https://github.com/MrckJd" target="_blank" class="hover:underline text-gray-700 dark:text-gray-300">
                                     Marck Jude Dura
