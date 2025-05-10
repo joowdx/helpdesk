@@ -3,14 +3,42 @@
 namespace App\Filament\Forms;
 
 use App\Models\Attachment;
+use Closure;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
 use Illuminate\Database\Eloquent\Model;
 
 class FileAttachment extends Section
 {
+    protected ?FileUpload $upload = null;
+
     protected function setUp(): void
     {
+        $this->upload = FileUpload::make('files')
+            ->hiddenLabel()
+            ->storeFileNamesIn('paths')
+            ->disk('local')
+            ->directory('attachments')
+            ->visibility('private')
+            ->previewable(false)
+            ->multiple()
+            ->maxFiles(12)
+            ->moveFiles()
+            ->maxSize(1024 * 12)
+            ->downloadable()
+            ->rule('clamav')
+            ->hint('You can upload up to 12 files, each with a maximum size of 12MB.')
+            ->helperText(function (?Model $record) {
+                $html = array_key_exists($record?->exists ? $record::class : $this->getModel(), Attachment::purgable()) ? <<<'HTML'
+                    <span class="text-sm text-custom-600 dark:text-custom-400" style="--c-400:var(--warning-400);--c-600:var(--warning-600);">
+                        Attachments are <b>deleted</b> after a certain period of time.
+                        Please <b>secure your files</b> somewhere else first if you intend to keep them long-term.
+                    </span>
+                HTML : null;
+
+                return str($html)->toHtmlString();
+            });
+
         parent::setUp();
 
         $this->collapsed();
@@ -23,31 +51,13 @@ class FileAttachment extends Section
 
         $this->compact();
 
-        $this->schema(fn (?Model $record) => [
-            FileUpload::make('files')
-                ->hiddenLabel()
-                ->storeFileNamesIn('paths')
-                ->disk('local')
-                ->directory('attachments')
-                ->visibility('private')
-                ->previewable(false)
-                ->multiple()
-                ->maxFiles(12)
-                ->moveFiles()
-                ->maxSize(1024 * 12)
-                ->downloadable()
-                ->rule('clamav')
-                ->hint('You can upload up to 12 files, each with a maximum size of 12MB.')
-                ->helperText(function () use ($record) {
-                    $html = array_key_exists($record?->exists ? $record::class : $this->getModel(), Attachment::purgable()) ? <<<'HTML'
-                        <span class="text-sm text-custom-600 dark:text-custom-400" style="--c-400:var(--warning-400);--c-600:var(--warning-600);">
-                            Attachments are <b>deleted</b> after a certain period of time.
-                            Please <b>secure your files</b> somewhere else first if you intend to keep them long-term.
-                        </span>
-                    HTML : null;
+        $this->schema([$this->upload]);
+    }
 
-                    return str($html)->toHtmlString();
-                }),
-        ]);
+    public function component(Closure $static): static
+    {
+        $static($this->upload);
+
+        return $this;
     }
 }

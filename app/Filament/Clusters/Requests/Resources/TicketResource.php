@@ -15,6 +15,7 @@ use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\ReinstateRequestAction;
 use App\Filament\Actions\Tables\RejectRequestAction;
 use App\Filament\Actions\Tables\RequeueRequestAction;
+use App\Filament\Actions\Tables\RespondRequestAction;
 use App\Filament\Actions\Tables\RestoreRequestAction;
 use App\Filament\Actions\Tables\StartRequestAction;
 use App\Filament\Actions\Tables\SuspendRequestAction;
@@ -37,6 +38,8 @@ class TicketResource extends RequestResource
     protected static ?int $navigationSort = -2;
 
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
+
+    protected static ?string $navigationGroup = 'Inbound';
 
     protected static ?string $label = 'Tickets';
 
@@ -75,6 +78,7 @@ class TicketResource extends RequestResource
                     ReinstateRequestAction::make(),
                     RequeueRequestAction::make(),
                     RejectRequestAction::make(),
+                    RespondRequestAction::make(),
                     CompileRequestAction::make(),
                     RecategorizeRequestAction::make(),
                     ReclassifyRequestAction::make(),
@@ -92,6 +96,7 @@ class TicketResource extends RequestResource
                     ReinstateRequestAction::make(),
                     RequeueRequestAction::make(),
                     RejectRequestAction::make(),
+                    RespondRequestAction::make(),
                     CompileRequestAction::make(),
                     RecategorizeRequestAction::make(),
                     ReclassifyRequestAction::make(),
